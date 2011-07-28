@@ -17,20 +17,18 @@ package com.liferay.portlet.documentlibrary.util;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 
 /**
  * @author Alexander Chow
  * @author Mika Koivisto
+ * @author Miguel Pastor
  */
 public class RawMetadataProcessor implements DLProcessor {
 
 	public void trigger(FileEntry fileEntry) {
-		if (fileEntry instanceof LiferayFileEntry) {
-			MessageBusUtil.sendMessage(
-				DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR,
-				fileEntry.getModel());
-		}
+		MessageBusUtil.sendMessage(
+			DestinationNames.DOCUMENT_LIBRARY_RAW_METADATA_PROCESSOR,
+			fileEntry);
 	}
 
 }
