@@ -18,13 +18,12 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.messaging.BaseMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.metadata.RawMetadataProcessorUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFileVersion;
-import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryMetadataLocalServiceUtil;
-import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
@@ -41,15 +40,11 @@ public class RawMetadataProcessorMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		DLFileEntry dlFileEntry = (DLFileEntry)message.getPayload();
+		FileEntry fileEntry = (FileEntry)message.getPayload();
 
-		DLFileVersion dlFileVersion =
-			DLFileVersionLocalServiceUtil.getLatestFileVersion(
-				dlFileEntry.getFileEntryId(), false);
+		FileVersion fileVersion = fileEntry.getFileVersion();
 
-		InputStream inputStream = DLFileEntryLocalServiceUtil.getFileAsStream(
-			dlFileEntry.getUserId(), dlFileEntry.getFileEntryId(),
-			dlFileVersion.getVersion());
+		InputStream inputStream = fileVersion.getContentStream(false);
 
 		Map<String, Fields> rawMetadataMap =
 			RawMetadataProcessorUtil.getRawMetadataMap(inputStream);
@@ -61,12 +56,12 @@ public class RawMetadataProcessorMessageListener extends BaseMessageListener {
 
 		ServiceContext serviceContext = new ServiceContext();
 
-		serviceContext.setScopeGroupId(dlFileEntry.getGroupId());
-		serviceContext.setUserId(dlFileEntry.getUserId());
+		serviceContext.setScopeGroupId(fileEntry.getGroupId());
+		serviceContext.setUserId(fileEntry.getUserId());
 
 		DLFileEntryMetadataLocalServiceUtil.updateFileEntryMetadata(
-			dlFileEntry.getCompanyId(), ddmStructures, 0L,
-			dlFileEntry.getFileEntryId(), dlFileVersion.getFileVersionId(),
+			fileEntry.getCompanyId(), ddmStructures, 0L,
+			fileEntry.getFileEntryId(), fileVersion.getFileVersionId(),
 			rawMetadataMap, serviceContext);
 	}
 
