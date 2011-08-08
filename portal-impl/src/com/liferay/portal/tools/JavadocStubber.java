@@ -576,6 +576,10 @@ public class JavadocStubber {
 
 					sb.append(PARAM_ID);
 
+					if(javaMethod.getName().startsWith("update")) {
+						sb.append("something's ");
+					}
+
 					int index = -1;
 					if (paramName.endsWith("Id")) {
 						index = paramName.indexOf("Id");
@@ -612,6 +616,10 @@ public class JavadocStubber {
 						index = paramName.indexOf("PKs");
 					}
 
+					if(javaMethod.getName().startsWith("update")) {
+						sb.append("something's ");
+					}
+
 					if (index > 0) {
 						String text =
 							splitCamelCase(paramName.substring(0, index));
@@ -636,7 +644,7 @@ public class JavadocStubber {
 					sb.append(PARAM_END);
 				}
 				else if (paramName.endsWith("Context")) {
-					sb.append(PARAM_GENERAL_1);
+					sb.append(" the TODO ");
 					String text = splitCamelCase(paramName);
 					String[] splitText =
 						StringUtil.split(text, StringPool.SPACE);
@@ -646,7 +654,11 @@ public class JavadocStubber {
 						sb.append("something");
 					}
 
-					sb.append(" Must specify what? Can specify what? " +
+					if(javaMethod.getName().startsWith("update")) {
+						sb.append(" to apply");
+					}
+
+					sb.append(". Must specify what? Can specify what? " +
 						"(optionally <code>null</code>)");
 				}
 				else if (javaParameter.getType().getJavaClass().isA(
@@ -660,7 +672,7 @@ public class JavadocStubber {
 					sb.append(PARAM_SORTER);
 				}
 				else {
-					sb.append(PARAM_GENERAL_1);
+					sb.append(" the TODO ");
 					String text = splitCamelCase(paramName);
 					String[] splitText =
 						StringUtil.split(text, StringPool.SPACE);
@@ -670,20 +682,25 @@ public class JavadocStubber {
 						sb.append("something");
 					}
 
+					if(!paramName.startsWith("old")) {
+						if (javaMethod.getName().startsWith("update") ||
+							paramName.startsWith("new")) {
+
+							sb.append(" to assign?");
+						}
+					}
+
+					sb.append(", default and acceptable values?");
+
 					// append appropriate option
 					Type paramType = javaParameter.getType();
 					if (!paramType.isPrimitive()) {
-						sb.append(PARAM_GENERAL_2);
 						sb.append(" (optionally <code>null</code>)");
 					}
 					else if (paramType.getJavaClass().isA("int") ||
 							 paramType.getJavaClass().isA("long") ||
 							 paramType.getJavaClass().isA("double")) {
-						sb.append(PARAM_GENERAL_2);
 						sb.append(" (optionally <code>0</code>)");
-					}
-					else {
-						sb.append(PARAM_GENERAL_2);
 					}
 				}
 
@@ -1774,10 +1791,6 @@ public class JavadocStubber {
 	private static final String METHOD_DESC_RETURNS_RANGE =
 		" Returns a range of all the TODO somethings matching the condition";
 
-	private static final String PARAM_GENERAL_1 =
-		" the TODO something's ";
-	private static final String PARAM_GENERAL_2 =
-		", acceptable values?";
 	private static final String PARAM_BOOLEAN =
 		" whether to TODO do something";
 	private static final String PARAM_COMPARATOR =
@@ -1789,16 +1802,16 @@ public class JavadocStubber {
 	private static final String PARAM_END =
 		" the TODO upper bound of the range of results (not inclusive)";
 	private static final String PARAM_ID =
-		" the primary key of the TODO something's ";
+		" the primary key of the TODO ";
 	private static final String PARAM_IDS =
-		" the primary keys of the TODO something's ";
+		" the primary keys of the TODO ";
 	private static final String PARAM_START =
 		" the TODO lower bound of the range of results";
 
 	private static final String RETURN_GENERAL =
 		" the TODO something, any special return values?";
 	private static final String RETURN_BOOLEAN =
-		" <code>true</code> if the TODO something meets some condition; " +
+		" <code>true</code> if TODO some condition is met; " +
 		"<code>false</code> otherwise";
 	private static final String RETURN_COLLECTION =
 		" the TODO somethings, any special return values?";
