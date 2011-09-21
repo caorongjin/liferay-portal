@@ -1808,10 +1808,21 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, long newFolderId, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
+		Repository sourceRepository = getRepository(0, fileEntryId, 0);
+		Repository destinationRepository = getRepository(newFolderId, 0, 0);
 
-		return repository.moveFileEntry(
-			fileEntryId, newFolderId, serviceContext);
+		FileEntry sourceFileEntry = sourceRepository.getFileEntry(fileEntryId);
+
+		FileEntry destinationFileEntry = destinationRepository.addFileEntry(
+			newFolderId, sourceFileEntry.getNameWithExtension(),
+			sourceFileEntry.getMimeType(),sourceFileEntry.getTitle(),
+			sourceFileEntry.getDescription(), StringPool.BLANK,
+			sourceFileEntry.getContentStream(), sourceFileEntry.getSize(),
+			serviceContext);
+
+		sourceRepository.deleteFileEntry(fileEntryId);
+
+		return destinationFileEntry;
 	}
 
 	/**
