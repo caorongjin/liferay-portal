@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.spring.transaction.TransactionCommitCallbackUtil;
@@ -196,16 +197,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, file, serviceContext);
 
-		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
-
-				public Void call() throws Exception {
-					DLProcessorRegistryUtil.trigger(fileEntry);
-
-					return null;
-				}
-
-			});
+		registerTransactionCallback(fileEntry);
 
 		return fileEntry;
 	}
@@ -271,16 +263,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			userId, folderId, sourceFileName, mimeType, title, description,
 			changeLog, is, size, serviceContext);
 
-		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
-
-				public Void call() throws Exception {
-					DLProcessorRegistryUtil.trigger(fileEntry);
-
-					return null;
-				}
-
-			});
+		registerTransactionCallback(fileEntry);
 
 		return fileEntry;
 	}
@@ -1252,10 +1235,64 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		LocalRepository localRepository = getLocalRepository(0, fileEntryId, 0);
+		LocalRepository sourceRepository =
+			getLocalRepository(0, fileEntryId, 0);
+		LocalRepository destinationRepository =
+			getLocalRepository(newFolderId, 0, 0);
 
-		return localRepository.moveFileEntry(
-			userId, fileEntryId, newFolderId, serviceContext);
+		FileEntry sourceFileEntry = sourceRepository.getFileEntry(fileEntryId);
+
+		List<FileVersion> fileVersions =
+			sourceFileEntry.getFileVersions(WorkflowConstants.STATUS_ANY);
+
+		int fileVersionsSize = fileVersions.size();
+
+		FileVersion fileVersion = fileVersions.get(fileVersionsSize - 1);
+
+		FileEntry destinationFileEntry =
+				destinationRepository.addFileEntry(userId, newFolderId,
+					sourceFileEntry.getNameWithExtension(),
+					fileVersion.getMimeType(),fileVersion.getTitle(),
+					fileVersion.getDescription(), StringPool.BLANK,
+					fileVersion.getContentStream(false), fileVersion.getSize(),
+					serviceContext);
+
+		for (int i = fileVersionsSize - 2; i >= 0 ; i--) {
+			fileVersion = fileVersions.get(i);
+
+			try {
+				destinationFileEntry =
+					destinationRepository.updateFileEntry(userId,
+						destinationFileEntry.getFileEntryId(),
+						sourceFileEntry.getNameWithExtension(),
+						destinationFileEntry.getMimeType(),
+						destinationFileEntry.getTitle(),
+						destinationFileEntry.getDescription(),
+						StringPool.BLANK, false,
+						fileVersion.getContentStream(false),
+						fileVersion.getSize(), serviceContext);
+			}
+			catch (PortalException pe) {
+				destinationRepository.deleteFileEntry(
+					destinationFileEntry.getFileEntryId());
+
+				throw  pe;
+			}
+		}
+
+		try {
+			sourceRepository.deleteFileEntry(fileEntryId);
+		}
+		catch (PortalException pe) {
+			destinationRepository.deleteFileEntry(
+				destinationFileEntry.getFileEntryId());
+
+			throw pe;
+		}
+
+		registerTransactionCallback(sourceFileEntry);
+
+		return destinationFileEntry;
 	}
 
 	/**
@@ -1418,16 +1455,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, file, serviceContext);
 
-		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
-
-				public Void call() throws Exception {
-					DLProcessorRegistryUtil.trigger(fileEntry);
-
-					return null;
-				}
-
-			});
+		registerTransactionCallback(fileEntry);
 
 		return fileEntry;
 	}
@@ -1491,16 +1519,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			userId, fileEntryId, sourceFileName, mimeType, title, description,
 			changeLog, majorVersion, is, size, serviceContext);
 
-		TransactionCommitCallbackUtil.registerCallback(
-			new Callable<Void>() {
-
-				public Void call() throws Exception {
-					DLProcessorRegistryUtil.trigger(fileEntry);
-
-					return null;
-				}
-
-			});
+		registerTransactionCallback(fileEntry);
 
 		return fileEntry;
 	}
@@ -1633,6 +1652,20 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 		return repositoryService.getLocalRepositoryImpl(
 			folderId, fileEntryId, fileVersionId);
+	}
+
+	protected void registerTransactionCallback(final FileEntry fileEntry) {
+
+		TransactionCommitCallbackUtil.registerCallback(
+			new Callable<Void>() {
+
+				public Void call() throws Exception {
+					DLProcessorRegistryUtil.trigger(fileEntry);
+
+					return null;
+				}
+
+			});
 	}
 
 }

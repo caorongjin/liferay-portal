@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Hits;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TempFileUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
@@ -1808,10 +1810,22 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long fileEntryId, long newFolderId, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
+		Repository sourceRepository = getRepository(0, fileEntryId, 0);
+		Repository destinationRepository = getRepository(newFolderId, 0, 0);
 
-		return repository.moveFileEntry(
-			fileEntryId, newFolderId, serviceContext);
+		FileEntry sourceFileEntry = sourceRepository.getFileEntry(fileEntryId);
+
+		FileEntry destinationFileEntry =
+			deepCopyFileEntry(destinationRepository, sourceFileEntry,
+				newFolderId, serviceContext);
+
+		deleteWithErrorHandling(
+			fileEntryId, destinationFileEntry.getFileEntryId(),
+			sourceRepository, destinationRepository);
+
+		registerTransactionCallback(destinationFileEntry);
+
+		return destinationFileEntry;
 	}
 
 	/**
@@ -1828,9 +1842,70 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			long folderId, long parentFolderId, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(folderId, 0, 0);
+		Repository sourceRepository = getRepository(folderId, 0, 0);
+		Repository destinationRepository = getRepository(parentFolderId, 0, 0);
 
-		return repository.moveFolder(folderId, parentFolderId, serviceContext);
+		// create the new destination folder
+
+		Folder folder = sourceRepository.getFolder(folderId);
+
+		Folder newFolder =
+			destinationRepository.addFolder(parentFolderId, folder.getName(),
+				folder.getDescription(), serviceContext);
+
+		long newFolderId = newFolder.getFolderId();
+
+		// move all the hierarchy to the new folder
+
+		List<Object> foldersAndFiles =
+			getFoldersAndFileEntriesAndFileShortcuts(
+				sourceRepository.getRepositoryId(), folderId,
+				WorkflowConstants.STATUS_ANY,true, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS);
+
+		try {
+			for (Object item : foldersAndFiles) {
+				if (item instanceof FileEntry) {
+					FileEntry fileEntry = (FileEntry)item;
+
+					FileEntry destinationFileEntry =
+						deepCopyFileEntry(destinationRepository, fileEntry,
+							newFolderId, serviceContext);
+
+					registerTransactionCallback(destinationFileEntry);
+
+				} else if (item instanceof Folder) {
+					Folder currentFolder = (Folder)item;
+
+					moveFolder(currentFolder.getFolderId(), newFolderId,
+						serviceContext);
+				} else if (item instanceof DLFileShortcut) {
+
+					if (newFolder.isSupportsShortcuts()) {
+						DLFileShortcut fileShorcut = (DLFileShortcut)item;
+
+						dlFileShortcutService.addFileShortcut(
+							fileShorcut.getGroupId(),newFolderId,
+							fileShorcut.getToFileEntryId(), serviceContext);
+					}
+				}
+			}
+		} catch (PortalException pe) {
+			destinationRepository.deleteFolder(newFolderId);
+
+			throw  pe;
+		}
+
+		try {
+			sourceRepository.deleteFolder(folderId);
+		}
+		catch (PortalException pe) {
+			destinationRepository.deleteFolder(newFolderId);
+
+			throw pe;
+		}
+
+		return newFolder;
 	}
 
 	/**
@@ -2439,6 +2514,67 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			});
 	}
 
+	protected FileEntry deepCopyFileEntry(
+			Repository target, FileEntry fileEntry, long newFolderId,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		List<FileVersion> fileVersions =
+			fileEntry.getFileVersions(WorkflowConstants.STATUS_ANY);
+
+		int fileVersionsSize = fileVersions.size();
+
+		FileVersion fileVersion = fileVersions.get(fileVersionsSize - 1);
+
+		FileEntry destinationFileEntry =
+			target.addFileEntry(
+				newFolderId, fileEntry.getNameWithExtension(),
+				fileVersion.getMimeType(), fileVersion.getTitle(),
+				fileVersion.getDescription(), StringPool.BLANK,
+				fileVersion.getContentStream(false), fileVersion.getSize(),
+				serviceContext);
+
+		for (int i = fileVersionsSize - 2; i >= 0 ; i--) {
+			fileVersion = fileVersions.get(i);
+
+			try {
+				destinationFileEntry =
+					target.updateFileEntry(
+						destinationFileEntry.getFileEntryId(),
+						fileEntry.getNameWithExtension(),
+						destinationFileEntry.getMimeType(),
+						destinationFileEntry.getTitle(),
+						destinationFileEntry.getDescription(),
+						StringPool.BLANK, false,
+						fileVersion.getContentStream(false),
+						fileVersion.getSize(), serviceContext);
+			}
+			catch (PortalException pe) {
+				target.deleteFileEntry(
+					destinationFileEntry.getFileEntryId());
+
+				throw  pe;
+			}
+		}
+
+		return destinationFileEntry;
+	}
+
+	protected void deleteWithErrorHandling(
+			long oldFileEntryId, long newFileEntryId,
+			Repository sourceRepository, Repository destinationRepository)
+		throws PortalException, SystemException {
+
+		try {
+			sourceRepository.deleteFileEntry(oldFileEntryId);
+		}
+		catch (PortalException pe) {
+			destinationRepository.deleteFileEntry(newFileEntryId);
+
+			throw pe;
+		}
+	}
+
 	protected Repository getRepository(long repositoryId)
 		throws PortalException, SystemException {
 
@@ -2451,6 +2587,20 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		return repositoryService.getRepositoryImpl(
 			folderId, fileEntryId, fileVersionId);
+	}
+
+	protected void registerTransactionCallback(final FileEntry fileEntry) {
+
+		TransactionCommitCallbackUtil.registerCallback(
+			new Callable<Void>() {
+
+				public Void call() throws Exception {
+					DLProcessorRegistryUtil.trigger(fileEntry);
+
+					return null;
+				}
+
+			});
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(DLAppServiceImpl.class);
