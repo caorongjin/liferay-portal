@@ -45,6 +45,9 @@ import javax.servlet.ServletContext;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+
 import org.hibernate.dialect.Dialect;
 
 /**
@@ -143,13 +146,16 @@ public class ConvertDatabase extends ConvertProcess {
 				_log.debug("Migrating database tables");
 			}
 
-			for (int i = 0; i < tableDetails.size(); i++) {
-				if ((i > 0) && (i % (tableDetails.size() / 4) == 0)) {
+			List<Tuple> filteredTableDetails = removeDuplicateSQLDDLCommand(
+				tableDetails);
+
+			for (int i = 0; i < filteredTableDetails.size(); i++) {
+				if ((i > 0) && (i % (filteredTableDetails.size() / 4) == 0)) {
 					MaintenanceUtil.appendStatus(
-						 (i * 100 / tableDetails.size()) + "%");
+						 (i * 100 / filteredTableDetails.size()) + "%");
 				}
 
-				Tuple tuple = tableDetails.get(i);
+				Tuple tuple = filteredTableDetails.get(i);
 
 				String table = (String)tuple.getObject(0);
 				Object[][] columns = (Object[][])tuple.getObject(1);
@@ -245,6 +251,34 @@ public class ConvertDatabase extends ConvertProcess {
 		if (tempFileName != null) {
 			table.populateTable(tempFileName, connection);
 		}
+	}
+
+	protected List<Tuple> removeDuplicateSQLDDLCommand(
+		final List<Tuple> tableDetails) {
+
+		final List<Tuple> copyTableDetails = new ArrayList<Tuple>(
+			tableDetails);
+
+		CollectionUtils.filter(copyTableDetails, new Predicate() {
+			public boolean evaluate(Object o) {
+				Tuple tableDetail = (Tuple)o;
+				String tableDetailSqlQuery = (String)tableDetail.getObject(2);
+
+				for (Tuple t: tableDetails) {
+					String currentSqlQuery = (String)t.getObject(2);
+
+					if (tableDetailSqlQuery.equals(currentSqlQuery) &&
+						tableDetail != t) {
+
+						return false;
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return copyTableDetails;
 	}
 
 	private static final Tuple[] _UNMAPPED_TABLES = new Tuple[] {
