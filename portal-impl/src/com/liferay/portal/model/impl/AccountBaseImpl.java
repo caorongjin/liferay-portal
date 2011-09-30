@@ -39,5 +39,6 @@ public abstract class AccountBaseImpl extends AccountModelImpl
 	 */
 	public void persist() throws SystemException {
 		AccountLocalServiceUtil.updateAccount(this);
+		fsfdsdfdsfsdfds
 	}
 }
