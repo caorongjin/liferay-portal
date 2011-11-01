@@ -224,7 +224,7 @@ public class MediaWikiImporter implements WikiImporter {
 		String fileName = paths[paths.length - 1];
 
 		try {
-			DLStoreUtil.validate(fileName, true, inputStream);
+			DLStoreUtil.validate(fileName, null, true, inputStream);
 		}
 		catch (PortalException pe) {
 			return false;

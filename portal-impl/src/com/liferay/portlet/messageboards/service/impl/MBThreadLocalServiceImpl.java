@@ -714,7 +714,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 				companyId, repositoryId, fileName);
 
 			DLStoreUtil.addFile(
-				companyId, repositoryId, newFileName, false, file);
+				companyId, repositoryId, newFileName, null, false, file);
 		}
 		catch (UnsupportedOperationException uoe) {
 			InputStream is = DLStoreUtil.getFileAsStream(
@@ -722,7 +722,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 
 			try {
 				DLStoreUtil.addFile(
-					companyId, repositoryId, newFileName, false, is);
+					companyId, repositoryId, newFileName, null, false, is);
 			}
 			finally {
 				try {

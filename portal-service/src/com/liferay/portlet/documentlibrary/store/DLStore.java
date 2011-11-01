@@ -34,17 +34,17 @@ public interface DLStore {
 		throws PortalException, SystemException;
 
 	public void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, byte[] bytes)
 		throws PortalException, SystemException;
 
 	public void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, File file)
 		throws PortalException, SystemException;
 
 	public void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, InputStream is)
 		throws PortalException, SystemException;
 
@@ -139,14 +139,16 @@ public interface DLStore {
 
 	public void updateFile(
 			long companyId, long repositoryId, String fileName,
-			String fileExtension, boolean validateFileExtension,
-			String versionLabel, String sourceFileName, File file)
+			String fileExtension, String fileType,
+			boolean validateFileExtension, String versionLabel,
+			String sourceFileName, File file)
 		throws PortalException, SystemException;
 
 	public void updateFile(
 			long companyId, long repositoryId, String fileName,
-			String fileExtension, boolean validateFileExtension,
-			String versionLabel, String sourceFileName, InputStream is)
+			String fileExtension, String fileType,
+			boolean validateFileExtension, String versionLabel,
+			String sourceFileName, InputStream is)
 		throws PortalException, SystemException;
 
 	public void updateFileVersion(
@@ -155,29 +157,32 @@ public interface DLStore {
 		throws PortalException, SystemException;
 
 	public void validate(
-			String fileName, boolean validateFileExtension)
+			String fileName, String fileType, boolean validateFileExtension)
 		throws PortalException, SystemException;
 
 	public void validate(
-			String fileName, boolean validateFileExtension, byte[] bytes)
+			String fileName, String fileType, boolean validateFileExtension,
+			byte[] bytes)
 		throws PortalException, SystemException;
 
 	public void validate(
-			String fileName, boolean validateFileExtension, File file)
+			String fileName, String fileType, boolean validateFileExtension,
+			File file)
 		throws PortalException, SystemException;
 
 	public void validate(
-			String fileName, boolean validateFileExtension, InputStream is)
+			String fileName, String fileType, boolean validateFileExtension,
+			InputStream is)
 		throws PortalException, SystemException;
 
 	public void validate(
 			String fileName, String fileExtension, String sourceFileName,
-			boolean validateFileExtension, File file)
+			String fileType, boolean validateFileExtension, File file)
 		throws PortalException, SystemException;
 
 	public void validate(
 			String fileName, String fileExtension, String sourceFileName,
-			boolean validateFileExtension, InputStream is)
+			String fileType, boolean validateFileExtension, InputStream is)
 		throws PortalException, SystemException;
 
 }

@@ -128,7 +128,12 @@ public class DLFileEntryLocalServiceImpl
 			DLUtil.getGroupIds(groupId), folderId, fileEntryTypeId);
 		Date now = new Date();
 
-		validateFile(groupId, folderId, title, extension, file, is);
+		DLFileEntryType fileEntryType =
+			dlFileEntryTypePersistence.findByPrimaryKey(fileEntryTypeId);
+
+		validateFile(
+			groupId, folderId, title, extension, fileEntryType.getName(), file,
+			is);
 
 		long fileEntryId = counterLocalService.increment();
 
@@ -179,12 +184,12 @@ public class DLFileEntryLocalServiceImpl
 		if (file != null) {
 			DLStoreUtil.addFile(
 				user.getCompanyId(), dlFileEntry.getDataRepositoryId(), name,
-				false, file);
+				null, false, file);
 		}
 		else {
 			DLStoreUtil.addFile(
 				user.getCompanyId(), dlFileEntry.getDataRepositoryId(), name,
-				false, is);
+				null, false, is);
 		}
 
 		// Index
@@ -1477,10 +1482,13 @@ public class DLFileEntryLocalServiceImpl
 
 			Date now = new Date();
 
+			DLFileEntryType fileEntryType =
+				dlFileEntryTypePersistence.findByPrimaryKey(fileEntryTypeId);
+
 			validateFile(
 				dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
-				dlFileEntry.getFileEntryId(), extension, title, sourceFileName,
-				file, is);
+				dlFileEntry.getFileEntryId(), extension, title,
+				fileEntryType.getName(),sourceFileName, file, is);
 
 			// File version
 
@@ -1520,13 +1528,13 @@ public class DLFileEntryLocalServiceImpl
 					DLStoreUtil.updateFile(
 						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
 						dlFileEntry.getName(), dlFileEntry.getExtension(),
-						false, version, sourceFileName, file);
+						null, false, version, sourceFileName, file);
 				}
 				else {
 					DLStoreUtil.updateFile(
 						user.getCompanyId(), dlFileEntry.getDataRepositoryId(),
 						dlFileEntry.getName(), dlFileEntry.getExtension(),
-						false, version, sourceFileName, is);
+						null, false, version, sourceFileName, is);
 				}
 
 				// Index
@@ -1622,30 +1630,33 @@ public class DLFileEntryLocalServiceImpl
 
 	protected void validateFile(
 			long groupId, long folderId, long fileEntryId, String extension,
-			String title, String sourceFileName, File file, InputStream is)
+			String title, String fileType, String sourceFileName, File file,
+			InputStream is)
 		throws PortalException, SystemException {
 
 		if (Validator.isNotNull(sourceFileName)) {
 			if (file != null) {
 				DLStoreUtil.validate(
-					sourceFileName, extension, sourceFileName, true, file);
+					sourceFileName, extension, sourceFileName, fileType, true,
+					file);
 			}
 			else {
 				DLStoreUtil.validate(
-					sourceFileName, extension, sourceFileName, true, is);
+					sourceFileName, extension, sourceFileName, fileType, true,
+					is);
 			}
 		}
 
 		validateFileName(title);
 
-		DLStoreUtil.validate(title, false);
+		DLStoreUtil.validate(title, fileType, false);
 
 		validateFile(groupId, folderId, fileEntryId, title);
 	}
 
 	protected void validateFile(
 			long groupId, long folderId, String title, String extension,
-			File file, InputStream is)
+			String fileType, File file, InputStream is)
 		throws PortalException, SystemException {
 
 		String fileName = title + StringPool.PERIOD + extension;
@@ -1653,10 +1664,10 @@ public class DLFileEntryLocalServiceImpl
 		validateFileName(fileName);
 
 		if (file != null) {
-			DLStoreUtil.validate(fileName, true, file);
+			DLStoreUtil.validate(fileName, fileType, true, file);
 		}
 		else {
-			DLStoreUtil.validate(fileName, true, is);
+			DLStoreUtil.validate(fileName, fileType, true, is);
 		}
 
 		validateFile(groupId, folderId, 0, title);

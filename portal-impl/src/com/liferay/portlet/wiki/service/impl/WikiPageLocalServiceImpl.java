@@ -309,7 +309,7 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		}
 
 		DLStoreUtil.addFile(
-			companyId, repositoryId, dirName + "/" + fileName, false,
+			companyId, repositoryId, dirName + "/" + fileName, null, false,
 			inputStream);
 	}
 

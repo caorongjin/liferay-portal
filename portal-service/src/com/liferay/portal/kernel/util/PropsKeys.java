@@ -553,6 +553,8 @@ public interface PropsKeys {
 
 	public static final String DL_FILE_ENTRY_THUMBNAIL_WIDTH = "dl.file.entry.thumbnail.width";
 
+	public static final String DL_FILE_ENTRY_VIDEO_EXTENSIONS = "dl.file.entry.video.extensions";
+
 	public static final String DL_FILE_EXTENSIONS = "dl.file.extensions";
 
 	public static final String DL_FILE_EXTENSIONS_STRICT_CHECK = "dl.file.extensions.strict.check";
