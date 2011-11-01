@@ -173,7 +173,24 @@ else if (dlFileEntryType != null) {
 	<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="please-enter-a-unique-document-name" />
 
 	<liferay-ui:error exception="<%= FileExtensionException.class %>">
-		<liferay-ui:message key="document-names-must-end-with-one-of-the-following-extensions" /> <%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA), StringPool.COMMA_AND_SPACE) %>.
+
+		<%
+		String fileEntryTypeName = "document";
+		String fileExtensions = PropsKeys.DL_FILE_EXTENSIONS;
+
+		if (dlFileEntryType != null) {
+			fileEntryTypeName = dlFileEntryType.getName();
+
+			if (fileEntryTypeName.equals(DLFileEntryTypeConstants.NAME_IMAGE)) {
+				fileExtensions = PropsKeys.IG_IMAGE_EXTENSIONS;
+			}
+			else if (fileEntryTypeName.equals(DLFileEntryTypeConstants.NAME_VIDEO)) {
+				fileExtensions = PropsKeys.DL_FILE_ENTRY_VIDEO_EXTENSIONS;
+			}
+		}
+		%>
+
+		<liferay-ui:message arguments="<%= fileEntryTypeName %>" key="x-names-must-end-with-one-of-the-following-extensions" /> <%= StringUtil.merge(PrefsPropsUtil.getStringArray(fileExtensions, StringPool.COMMA), StringPool.COMMA_AND_SPACE) %>.
 	</liferay-ui:error>
 
 	<liferay-ui:error exception="<%= FileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />

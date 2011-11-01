@@ -87,6 +87,7 @@ public class DLStoreUtil {
 	 * @param  repositoryId the primary key of the data repository (optionally
 	 *         {@link CompanyConstants#SYSTEM})
 	 * @param  fileName the file name
+	 * @param  fileType the file type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  bytes the files's data
 	 * @throws PortalException if the file's information was invalid or is found
@@ -94,12 +95,13 @@ public class DLStoreUtil {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, byte[] bytes)
 		throws PortalException, SystemException {
 
 		getStore().addFile(
-			companyId, repositoryId, fileName, validateFileExtension, bytes);
+			companyId, repositoryId, fileName, fileType, validateFileExtension,
+			bytes);
 	}
 
 	/**
@@ -109,6 +111,7 @@ public class DLStoreUtil {
 	 * @param  repositoryId the primary key of the data repository (optionally
 	 *         {@link CompanyConstants#SYSTEM})
 	 * @param  fileName the file name
+	 * @param  fileType the file type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  file the files's data
 	 * @throws PortalException if the file's information was invalid or is found
@@ -116,12 +119,13 @@ public class DLStoreUtil {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, File file)
 		throws PortalException, SystemException {
 
 		getStore().addFile(
-			companyId, repositoryId, fileName, validateFileExtension, file);
+			companyId, repositoryId, fileName, fileType, validateFileExtension,
+			file);
 	}
 
 	/**
@@ -131,6 +135,7 @@ public class DLStoreUtil {
 	 * @param  repositoryId the primary key of the data repository (optionally
 	 *         {@link CompanyConstants#SYSTEM})
 	 * @param  fileName the file name
+	 * @param  fileType the file type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  is the files's data
 	 * @throws PortalException if the file's information was invalid or is found
@@ -138,12 +143,13 @@ public class DLStoreUtil {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void addFile(
-			long companyId, long repositoryId, String fileName,
+			long companyId, long repositoryId, String fileName, String fileType,
 			boolean validateFileExtension, InputStream is)
 		throws PortalException, SystemException {
 
 		getStore().addFile(
-			companyId, repositoryId, fileName, validateFileExtension, is);
+			companyId, repositoryId, fileName, fileType, validateFileExtension,
+			is);
 	}
 
 	/**
@@ -605,6 +611,7 @@ public class DLStoreUtil {
 	 *         {@link CompanyConstants#SYSTEM})
 	 * @param  fileName the file name
 	 * @param  fileExtension the file's extension
+	 * @param  fileType the file type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  versionLabel the file's new version label
 	 * @param  sourceFileName the new file's original name
@@ -615,12 +622,13 @@ public class DLStoreUtil {
 	 */
 	public static void updateFile(
 			long companyId, long repositoryId, String fileName,
-			String fileExtension, boolean validateFileExtension,
-			String versionLabel, String sourceFileName, File file)
+			String fileExtension, String fileType,
+			boolean validateFileExtension, String versionLabel,
+			String sourceFileName, File file)
 		throws PortalException, SystemException {
 
 		getStore().updateFile(
-			companyId, repositoryId, fileName, fileExtension,
+			companyId, repositoryId, fileName, fileType, fileExtension,
 			validateFileExtension, versionLabel, sourceFileName, file);
 	}
 
@@ -632,6 +640,7 @@ public class DLStoreUtil {
 	 *         {@link CompanyConstants#SYSTEM})
 	 * @param  fileName the file name
 	 * @param  fileExtension the file's extension
+	 * @param  fileType the file type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  versionLabel the file's new version label
 	 * @param  sourceFileName the new file's original name
@@ -642,12 +651,13 @@ public class DLStoreUtil {
 	 */
 	public static void updateFile(
 			long companyId, long repositoryId, String fileName,
-			String fileExtension, boolean validateFileExtension,
-			String versionLabel, String sourceFileName, InputStream is)
+			String fileExtension, String fileType,
+			boolean validateFileExtension, String versionLabel,
+			String sourceFileName, InputStream is)
 		throws PortalException, SystemException {
 
 		getStore().updateFile(
-			companyId, repositoryId, fileName, fileExtension,
+			companyId, repositoryId, fileName, fileExtension, fileType,
 			validateFileExtension, versionLabel, sourceFileName, is);
 	}
 
@@ -679,62 +689,70 @@ public class DLStoreUtil {
 	 * Validates a file's name.
 	 *
 	 * @param  fileName the file's name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @throws PortalException if the file's information was invalid
 	 * @throws SystemException if a system exception occurred
 	 */
-	public static void validate(String fileName, boolean validateFileExtension)
+	public static void validate(
+			String fileName, String fileType, boolean validateFileExtension)
 		throws PortalException, SystemException {
 
-		getStore().validate(fileName, validateFileExtension);
+		getStore().validate(fileName, fileType, validateFileExtension);
 	}
 
 	/**
 	 * Validates a file's name and data.
 	 *
 	 * @param  fileName the file's name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  bytes the file's data (optionally <code>null</code>)
 	 * @throws PortalException if the file's information was invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void validate(
-			String fileName, boolean validateFileExtension, byte[] bytes)
+			String fileName, String fileType, boolean validateFileExtension,
+			byte[] bytes)
 		throws PortalException, SystemException {
 
-		getStore().validate(fileName, validateFileExtension, bytes);
+		getStore().validate(fileName, fileType, validateFileExtension, bytes);
 	}
 
 	/**
 	 * Validates a file's name and data.
 	 *
 	 * @param  fileName the file's name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  file the file's data (optionally <code>null</code>)
 	 * @throws PortalException if the file's information was invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void validate(
-			String fileName, boolean validateFileExtension, File file)
+			String fileName, String fileType, boolean validateFileExtension,
+			File file)
 		throws PortalException, SystemException {
 
-		getStore().validate(fileName, validateFileExtension, file);
+		getStore().validate(fileName, fileType, validateFileExtension, file);
 	}
 
 	/**
 	 * Validates a file's name and data.
 	 *
 	 * @param  fileName the file's name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  is the file's data (optionally <code>null</code>)
 	 * @throws PortalException if the file's information was invalid
 	 * @throws SystemException if a system exception occurred
 	 */
 	public static void validate(
-			String fileName, boolean validateFileExtension, InputStream is)
+			String fileName, String fileType, boolean validateFileExtension,
+			InputStream is)
 		throws PortalException, SystemException {
 
-		getStore().validate(fileName, validateFileExtension, is);
+		getStore().validate(fileName, fileType, validateFileExtension, is);
 	}
 
 	/**
@@ -743,6 +761,7 @@ public class DLStoreUtil {
 	 * @param  fileName the file's name
 	 * @param  fileExtension the file's extension
 	 * @param  sourceFileName the file's original name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  file the file's data (optionally <code>null</code>)
 	 * @throws PortalException if the file's information was invalid
@@ -750,12 +769,12 @@ public class DLStoreUtil {
 	 */
 	public static void validate(
 			String fileName, String fileExtension, String sourceFileName,
-			boolean validateFileExtension, File file)
+			String fileType, boolean validateFileExtension, File file)
 		throws PortalException, SystemException {
 
 		getStore().validate(
-			fileName, fileExtension, sourceFileName, validateFileExtension,
-			file);
+			fileName, fileExtension, sourceFileName, fileType,
+			validateFileExtension, file);
 	}
 
 	/**
@@ -764,6 +783,7 @@ public class DLStoreUtil {
 	 * @param  fileName the file's name
 	 * @param  fileExtension the file's extension
 	 * @param  sourceFileName the file's original name
+	 * @param  fileType the file's type
 	 * @param  validateFileExtension whether to validate the file's extension
 	 * @param  is the file's data (optionally <code>null</code>)
 	 * @throws PortalException if the file's information was invalid
@@ -771,11 +791,12 @@ public class DLStoreUtil {
 	 */
 	public static void validate(
 			String fileName, String fileExtension, String sourceFileName,
-			boolean validateFileExtension, InputStream is)
+			String fileType, boolean validateFileExtension, InputStream is)
 		throws PortalException, SystemException {
 
 		getStore().validate(
-			fileName, fileExtension, sourceFileName, validateFileExtension, is);
+			fileName, fileExtension, sourceFileName, fileType,
+			validateFileExtension, is);
 	}
 
 	/**

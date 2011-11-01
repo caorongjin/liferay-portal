@@ -35,7 +35,7 @@ public class TempFileUtil {
 
 		String tempFileName = FileUtil.createTempFileName();
 
-		DLStoreUtil.validate(tempFileName, true, file);
+		DLStoreUtil.validate(tempFileName, null, true, file);
 
 		File tempFile = getTempFile(tempFileName, tempPathName);
 
@@ -48,7 +48,7 @@ public class TempFileUtil {
 			long userId, String fileName, String tempPathName, File file)
 		throws IOException, PortalException, SystemException {
 
-		DLStoreUtil.validate(fileName, true, file);
+		DLStoreUtil.validate(fileName, null, true, file);
 
 		File tempFile = getTempFile(userId, fileName, tempPathName);
 
@@ -70,10 +70,10 @@ public class TempFileUtil {
 
 			file = byteArrayFileInputStream.getFile();
 
-			DLStoreUtil.validate(fileName, true, file);
+			DLStoreUtil.validate(fileName, null, true, file);
 		}
 		else {
-			DLStoreUtil.validate(fileName, true, inputStream);
+			DLStoreUtil.validate(fileName, null, true, inputStream);
 		}
 
 		File tempFile = getTempFile(userId, fileName, tempPathName);
@@ -93,7 +93,7 @@ public class TempFileUtil {
 
 		String tempFileName = FileUtil.createTempFileName();
 
-		DLStoreUtil.validate(tempFileName, false, file);
+		DLStoreUtil.validate(tempFileName, null, false, file);
 
 		File tempFile = getTempFile(tempFileName, tempPathName);
 
@@ -106,7 +106,7 @@ public class TempFileUtil {
 			String fileName, String tempPathName, File file)
 		throws IOException, PortalException, SystemException {
 
-		DLStoreUtil.validate(fileName, true, file);
+		DLStoreUtil.validate(fileName, null, true, file);
 
 		File tempFile = getTempFile(fileName, tempPathName);
 
