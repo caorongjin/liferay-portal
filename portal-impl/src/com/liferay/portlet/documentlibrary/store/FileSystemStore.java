@@ -292,7 +292,7 @@ public class FileSystemStore extends BaseStore {
 	public void updateFile(
 			long companyId, long repositoryId, long newRepositoryId,
 			String fileName)
-		throws PortalException {
+		throws PortalException, SystemException {
 
 		File fileNameDir = getFileNameDir(companyId, repositoryId, fileName);
 		File newFileNameDir = getFileNameDir(
@@ -304,7 +304,20 @@ public class FileSystemStore extends BaseStore {
 
 		File parentFile = fileNameDir.getParentFile();
 
-		fileNameDir.renameTo(newFileNameDir);
+		try {
+			File parentNewFile = newFileNameDir.getParentFile();
+
+			if (!parentNewFile.exists()) {
+				parentNewFile.mkdir();
+			}
+
+			if (!fileNameDir.renameTo(newFileNameDir)) {
+				throw new IOException();
+			}
+		}
+		catch (IOException ioe) {
+			throw new SystemException(ioe);
+		}
 
 		deleteEmptyAncestors(parentFile);
 	}
