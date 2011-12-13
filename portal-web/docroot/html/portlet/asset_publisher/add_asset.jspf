@@ -154,7 +154,6 @@ public PortletURL getAddPortletURL(LiferayPortletRequest liferayPortletRequest, 
 
 			if (className.equals(DLFileEntry.class.getName())) {
 				addPortletURL.setParameter(Constants.CMD, Constants.ADD);
-				addPortletURL.setParameter("folderId", String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID));
 				addPortletURL.setParameter("fileEntryTypeId", String.valueOf(classTypeId));
 			}
 

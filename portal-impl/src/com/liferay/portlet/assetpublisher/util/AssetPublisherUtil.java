@@ -17,6 +17,7 @@ package com.liferay.portlet.assetpublisher.util;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -46,6 +47,8 @@ import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
@@ -458,10 +461,17 @@ public class AssetPublisherUtil {
 		Long classPK = _getRecentFolderIds(portletRequest).get(className);
 
 		if (classPK == null) {
-			return 0;
+			return DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 		}
 		else {
-			return classPK.longValue();
+			try {
+				Folder folder = DLAppLocalServiceUtil.getFolder(classPK);
+
+				return classPK;
+			}
+			catch (Exception e) {
+				return DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
+			}
 		}
 	}
 
