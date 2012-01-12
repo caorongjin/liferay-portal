@@ -385,29 +385,54 @@ public class DLUtil {
 		String queryString) {
 
 		return getPreviewURL(
-			fileEntry, fileVersion, themeDisplay, queryString, true);
+			fileEntry, fileVersion, themeDisplay, queryString, true, false);
 	}
 
 	public static String getPreviewURL(
 		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
-		String queryString, boolean appendToken) {
+		String queryString, boolean appendVersion, boolean appendToken) {
 
-		StringBundler sb = new StringBundler(13);
+		StringBundler sb = new StringBundler(3);
 
 		sb.append(themeDisplay.getPortalURL());
 		sb.append(themeDisplay.getPathContext());
+		sb.append(
+			getRelativePreviewURL(
+				fileEntry, fileVersion, themeDisplay, queryString,
+				appendVersion, appendToken));
+
+		return sb.toString();
+	}
+
+	public static String getRelativePreviewURL(
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString, boolean appendVersion, boolean appendToken) {
+
+		StringBundler sb = new StringBundler(13);
+
 		sb.append("/documents/");
 		sb.append(fileEntry.getRepositoryId());
 		sb.append(StringPool.SLASH);
 		sb.append(fileEntry.getFolderId());
 		sb.append(StringPool.SLASH);
-		sb.append(
-			HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle()), true));
-		sb.append("?version=");
-		sb.append(fileVersion.getVersion());
+		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())));
+		sb.append(StringPool.SLASH);
+		sb.append(fileEntry.getUuid());
 
-		if (appendToken) {
-			sb.append("&t=");
+		if (appendVersion) {
+			sb.append("?version=");
+			sb.append(fileVersion.getVersion());
+		}
+
+		Set<String> imageMimeTypes = ImageProcessorUtil.getImageMimeTypes();
+
+		if (imageMimeTypes.contains(fileEntry.getMimeType()) || appendToken) {
+			if (appendVersion) {
+				sb.append("&t=");
+			}
+			else {
+				sb.append("?t=");
+			}
 
 			Date modifiedDate = fileVersion.getModifiedDate();
 
@@ -418,7 +443,7 @@ public class DLUtil {
 
 		String previewURL = sb.toString();
 
-		if (themeDisplay.isAddSessionIdToURL()) {
+		if ((themeDisplay != null) && (themeDisplay.isAddSessionIdToURL())) {
 			return PortalUtil.getURLWithSessionId(
 				previewURL, themeDisplay.getSessionId());
 		}
