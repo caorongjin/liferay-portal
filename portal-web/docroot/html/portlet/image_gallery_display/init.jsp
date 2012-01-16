@@ -83,6 +83,7 @@ if (portletId.equals(PortletKeys.PORTLET_CONFIGURATION)) {
 boolean showActions = PrefsParamUtil.getBoolean(preferences, request, "showActions");
 boolean showAddFolderButton = false;
 boolean showFolderMenu = PrefsParamUtil.getBoolean(preferences, request, "showFolderMenu");
+boolean showExtension = PrefsParamUtil.getBoolean(preferences, request, "showExtension");
 boolean showTabs = PrefsParamUtil.getBoolean(preferences, request, "showTabs");
 
 Format dateFormatDate = FastDateFormatFactoryUtil.getDate(locale, timeZone);

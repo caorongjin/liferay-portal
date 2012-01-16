@@ -85,6 +85,8 @@ public class ReleaseInfo {
 
 	public static int RELEASE_6_1_0_BUILD_NUMBER = 6100;
 
+	public static int RELEASE_6_1_1_BUILD_NUMBER = 6101;
+
 	public static final String getName() {
 		return name;
 	}

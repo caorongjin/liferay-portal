@@ -61,7 +61,7 @@ boolean view = GetterUtil.getBoolean((String)request.getAttribute("view_image.js
 <c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.PERMISSIONS) %>">
 	<liferay-security:permissionsURL
 		modelResource="<%= DLFileEntryConstants.getClassName() %>"
-		modelResourceDescription="<%= String.valueOf(fileEntry.getTitle()) %>"
+		modelResourceDescription="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 		resourcePrimKey="<%= String.valueOf(fileEntry.getFileEntryId()) %>"
 		var="permissionsURL"
 	/>

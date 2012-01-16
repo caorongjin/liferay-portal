@@ -173,8 +173,8 @@ if (!fileEntries.isEmpty()) {
 				%>
 
 					<li class="move-file">
-						<span class="file-title" title="<%= validMoveFileEntry.getTitle() %>">
-							<%= validMoveFileEntry.getTitle() %>
+						<span class="file-title" title="<%= DLUtil.getTitle(validMoveFileEntry, showExtension) %>">
+							<%= DLUtil.getTitle(validMoveFileEntry, showExtension) %>
 						</span>
 					</li>
 
@@ -200,8 +200,8 @@ if (!fileEntries.isEmpty()) {
 				%>
 
 					<li class="move-file move-error">
-						<span class="file-title" title="<%= invalidMoveFileEntry.getTitle() %>">
-							<%= invalidMoveFileEntry.getTitle() %>
+						<span class="file-title" title="<%= DLUtil.getTitle(invalidMoveFileEntry, showExtension) %>">
+							<%= DLUtil.getTitle(invalidMoveFileEntry, showExtension) %>
 						</span>
 
 						<span class="error-message">

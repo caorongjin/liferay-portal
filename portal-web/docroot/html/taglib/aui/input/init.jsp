@@ -47,6 +47,7 @@ boolean first = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:i
 java.lang.String formName = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:formName"));
 java.lang.String helpMessage = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:helpMessage"));
 java.lang.String id = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:id"));
+boolean ignoreBeanValue = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:ignoreBeanValue")));
 boolean ignoreRequestValue = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:ignoreRequestValue")));
 boolean inlineField = GetterUtil.getBoolean(String.valueOf(request.getAttribute("aui:input:inlineField")));
 java.lang.String inlineLabel = GetterUtil.getString((java.lang.String)request.getAttribute("aui:input:inlineLabel"));
@@ -82,6 +83,7 @@ _updateOptions(_options, "first", first);
 _updateOptions(_options, "formName", formName);
 _updateOptions(_options, "helpMessage", helpMessage);
 _updateOptions(_options, "id", id);
+_updateOptions(_options, "ignoreBeanValue", ignoreBeanValue);
 _updateOptions(_options, "ignoreRequestValue", ignoreRequestValue);
 _updateOptions(_options, "inlineField", inlineField);
 _updateOptions(_options, "inlineLabel", inlineLabel);

@@ -89,6 +89,10 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		return _id;
 	}
 
+	public boolean getIgnoreBeanValue() {
+		return _ignoreBeanValue;
+	}
+
 	public boolean getIgnoreRequestValue() {
 		return _ignoreRequestValue;
 	}
@@ -253,6 +257,12 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setScopedAttribute("id", id);
 	}
 
+	public void setIgnoreBeanValue(boolean ignoreBeanValue) {
+		_ignoreBeanValue = ignoreBeanValue;
+
+		setScopedAttribute("ignoreBeanValue", ignoreBeanValue);
+	}
+
 	public void setIgnoreRequestValue(boolean ignoreRequestValue) {
 		_ignoreRequestValue = ignoreRequestValue;
 
@@ -389,6 +399,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		_formName = null;
 		_helpMessage = null;
 		_id = null;
+		_ignoreBeanValue = false;
 		_ignoreRequestValue = false;
 		_inlineField = false;
 		_inlineLabel = null;
@@ -432,6 +443,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 		setNamespacedAttribute(request, "formName", _formName);
 		setNamespacedAttribute(request, "helpMessage", _helpMessage);
 		setNamespacedAttribute(request, "id", _id);
+		setNamespacedAttribute(request, "ignoreBeanValue", _ignoreBeanValue);
 		setNamespacedAttribute(request, "ignoreRequestValue", _ignoreRequestValue);
 		setNamespacedAttribute(request, "inlineField", _inlineField);
 		setNamespacedAttribute(request, "inlineLabel", _inlineLabel);
@@ -473,6 +485,7 @@ public class BaseInputTag extends com.liferay.taglib.util.IncludeTag {
 	private java.lang.String _formName = null;
 	private java.lang.String _helpMessage = null;
 	private java.lang.String _id = null;
+	private boolean _ignoreBeanValue = false;
 	private boolean _ignoreRequestValue = false;
 	private boolean _inlineField = false;
 	private java.lang.String _inlineLabel = null;

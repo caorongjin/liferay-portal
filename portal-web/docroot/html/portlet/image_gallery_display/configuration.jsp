@@ -41,6 +41,8 @@ String redirect = ParamUtil.getString(request, "redirect");
 
 				<aui:input label="show-search" name="preferences--showFoldersSearch--" type="checkbox" value="<%= showFoldersSearch %>" />
 
+				<aui:input label="show-extension" name="preferences--showExtension--" type="checkbox" value="<%= showExtension %>" />
+
 				<aui:field-wrapper label="show-media-type">
 
 					<%

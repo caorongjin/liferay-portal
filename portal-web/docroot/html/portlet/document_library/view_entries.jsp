@@ -271,7 +271,7 @@ for (int i = 0; i < results.size(); i++) {
 							image='<%= "../file_system/small/" + DLUtil.getFileIcon(fileEntry.getExtension()) %>'
 							label="<%= true %>"
 							method="get"
-							message="<%= fileEntry.getTitle() %>"
+							message="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 							url="<%= rowURL.toString() %>"
 						/>
 
@@ -312,7 +312,7 @@ for (int i = 0; i < results.size(); i++) {
 					Map<String, Object> data = new HashMap<String, Object>();
 
 					data.put("draggable", DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE));
-					data.put("title", fileEntry.getTitle());
+					data.put("title", DLUtil.getTitle(fileEntry, showExtension));
 
 					row.setData(data);
 

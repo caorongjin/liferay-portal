@@ -35,25 +35,25 @@ if (fileEntry.getVersion().equals(fileVersion.getVersion())) {
 				<div>
 					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&imageThumbnail=1") %>" />
 
-					<%= fileVersion.getTitle() %>
+					<%= DLUtil.getTitle(fileVersion, showExtension) %>
 				</div>
 			</c:when>
 			<c:when test="<%= showThumbnail && PDFProcessorUtil.hasImages(fileVersion) %>">
 				<div>
 					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&documentThumbnail=1") %>" />
 
-					<%= fileVersion.getTitle() %>
+					<%= DLUtil.getTitle(fileVersion, showExtension) %>
 				</div>
 			</c:when>
 			<c:when test="<%= showThumbnail && VideoProcessorUtil.hasVideo(fileVersion) %>">
 				<div>
 					<img src="<%= DLUtil.getPreviewURL(fileEntry, fileVersion, themeDisplay, "&videoThumbnail=1") %>" />
 
-					<%= fileVersion.getTitle() %>
+					<%= DLUtil.getTitle(fileVersion, showExtension) %>
 				</div>
 			</c:when>
 			<c:otherwise>
-				<img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= fileVersion.getIcon() %>.png" /><%= HtmlUtil.escape(fileVersion.getTitle()) %>
+				<img class="dl-file-icon" src="<%= themeDisplay.getPathThemeImages() %>/file_system/small/<%= fileVersion.getIcon() %>.png" /><%= HtmlUtil.escape(DLUtil.getTitle(fileVersion, showExtension)) %>
 			</c:otherwise>
 		</c:choose>
 	</aui:a>

@@ -144,7 +144,7 @@ int mountFoldersCount = DLAppServiceUtil.getMountFoldersCount(scopeGroupId, DLFo
 			String rowHREF = rowURL.toString();
 
 			row.addText(folder.getName(), rowHREF);
-			row.addText(fileEntry.getTitle(), rowHREF);
+			row.addText(DLUtil.getTitle(fileEntry, showExtension), rowHREF);
 
 			// Action
 

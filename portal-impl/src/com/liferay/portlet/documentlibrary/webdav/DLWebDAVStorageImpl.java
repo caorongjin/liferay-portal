@@ -50,6 +50,7 @@ import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -186,8 +187,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			}
 
 			DLAppServiceUtil.addFileEntry(
-				groupId, parentFolderId, title, mimeType, title, description,
-				changeLog, file, serviceContext);
+				groupId, parentFolderId, FileUtil.stripExtension(title),
+				mimeType, title, description, changeLog, file, serviceContext);
 
 			return status;
 		}
@@ -593,7 +594,7 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 					DLAppServiceUtil.updateFileEntry(
 						destFileEntry.getFileEntryId(),
 						destFileEntry.getTitle(), destFileEntry.getMimeType(),
-						destFileEntry.getTitle(),
+						DLUtil.getTitle(destFileEntry, false),
 						destFileEntry.getDescription(), changeLog, false, file,
 						serviceContext);
 
@@ -608,8 +609,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 
 			DLAppServiceUtil.updateFileEntry(
 				fileEntry.getFileEntryId(), sourceFileName,
-				fileEntry.getMimeType(), title, description, changeLog, false,
-				file, serviceContext);
+				fileEntry.getMimeType(), FileUtil.stripExtension(title),
+				description, changeLog, false, file, serviceContext);
 
 			if (fileEntry.getFolderId() != newParentFolderId) {
 				fileEntry = DLAppServiceUtil.moveFileEntry(
@@ -679,6 +680,8 @@ public class DLWebDAVStorageImpl extends BaseWebDAVStorageImpl {
 			try {
 				FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 					groupId, parentFolderId, title);
+
+				title = FileUtil.stripExtension(title);
 
 				if (!hasLock(fileEntry, webDavRequest.getLockUuid()) &&
 					(fileEntry.getLock() != null)) {

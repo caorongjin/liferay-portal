@@ -30,7 +30,7 @@ FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_F
 long fileEntryId = fileEntry.getFileEntryId();
 long folderId = fileEntry.getFolderId();
 String extension = fileEntry.getExtension();
-String title = fileEntry.getTitle();
+String title = DLUtil.getTitle(fileEntry, showExtension);
 
 Folder folder = fileEntry.getFolder();
 FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION);
@@ -69,7 +69,7 @@ long assetClassPK = 0;
 
 if (!fileVersion.isApproved() && !fileVersion.getVersion().equals(DLFileEntryConstants.VERSION_DEFAULT)) {
 	assetClassPK = fileVersion.getFileVersionId();
-	title = fileVersion.getTitle();
+	title = DLUtil.getTitle(fileVersion, showExtension);
 	extension = fileVersion.getExtension();
 }
 else {
@@ -123,7 +123,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= false %>"
-		title="<%= fileEntry.getTitle() %>"
+		title="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 	/>
 </c:if>
 
@@ -168,7 +168,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 					<h2 class="document-title">
 						<c:choose>
 							<c:when test="<%= versionSpecific %>">
-								<%= fileVersion.getTitle() %>
+								<%= DLUtil.getTitle(fileVersion, showExtension) %>
 
 								(<liferay-ui:message key="version" /> <%= fileVersion.getVersion() %>)
 							</c:when>
@@ -889,7 +889,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 
 						<liferay-security:permissionsURL
 							modelResource="<%= DLFileEntryConstants.getClassName() %>"
-							modelResourceDescription="<%= fileEntry.getTitle() %>"
+							modelResourceDescription="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 							resourcePrimKey="<%= String.valueOf(fileEntry.getFileEntryId()) %>"
 							var="permissionsURL"
 						/>

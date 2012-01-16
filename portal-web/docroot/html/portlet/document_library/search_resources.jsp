@@ -357,7 +357,7 @@ int total = 0;
 								}
 
 								if (columnName.equals("name")) {
-									row.addText(fileEntry.getTitle(), rowURL);
+									row.addText(DLUtil.getTitle(fileEntry, showExtension), rowURL);
 								}
 
 								if (columnName.equals("size")) {

@@ -140,7 +140,7 @@ viewFolderURL.setParameter("folderId", String.valueOf(folderId));
 				<c:if test="<%= showActions && DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.PERMISSIONS) %>">
 					<liferay-security:permissionsURL
 						modelResource="<%= DLFileEntryConstants.getClassName() %>"
-						modelResourceDescription="<%= HtmlUtil.unescape(fileEntry.getTitle()) %>"
+						modelResourceDescription="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 						redirect="<%= currentURL %>"
 						resourcePrimKey="<%= String.valueOf(fileEntry.getFileEntryId()) %>"
 						var="permissionsURL"
@@ -215,7 +215,7 @@ viewFolderURL.setParameter("folderId", String.valueOf(folderId));
 				<c:if test="<%= showActions && DLFileShortcutPermission.contains(permissionChecker, fileShortcut, ActionKeys.PERMISSIONS) %>">
 					<liferay-security:permissionsURL
 						modelResource="<%= DLFileShortcut.class.getName() %>"
-						modelResourceDescription="<%= fileEntry.getTitle() %>"
+						modelResourceDescription="<%= DLUtil.getTitle(fileEntry, showExtension) %>"
 						redirect="<%= currentURL %>"
 						resourcePrimKey="<%= String.valueOf(fileShortcut.getFileShortcutId()) %>"
 						var="shortcutPermissionsURL"

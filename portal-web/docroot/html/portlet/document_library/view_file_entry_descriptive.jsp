@@ -32,8 +32,8 @@ PortletURL tempRowURL = (PortletURL)request.getAttribute("view_entries.jsp-tempR
 boolean showCheckBox = DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE);
 %>
 
-<div class="document-display-style display-descriptive <%= showCheckBox ? "selectable" : StringPool.BLANK %>" data-draggable="<%= showCheckBox ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" data-title="<%= StringUtil.shorten(fileEntry.getTitle(), 60) %>">
-	<a class="document-link" data-folder="<%= Boolean.FALSE.toString() %>" href="<%= tempRowURL.toString() %>" title="<%= HtmlUtil.escapeAttribute(HtmlUtil.unescape(fileEntry.getTitle()) + " - " + HtmlUtil.unescape(fileEntry.getDescription())) %>">
+<div class="document-display-style display-descriptive <%= showCheckBox ? "selectable" : StringPool.BLANK %>" data-draggable="<%= showCheckBox ? Boolean.TRUE.toString() : Boolean.FALSE.toString() %>" data-title="<%= StringUtil.shorten(DLUtil.getTitle(fileEntry, showExtension), 60) %>">
+	<a class="document-link" data-folder="<%= Boolean.FALSE.toString() %>" href="<%= tempRowURL.toString() %>" title="<%= HtmlUtil.escapeAttribute(HtmlUtil.unescape(DLUtil.getTitle(fileEntry, showExtension)) + " - " + HtmlUtil.unescape(fileEntry.getDescription())) %>">
 		<span class="document-thumbnail">
 
 			<%
@@ -53,7 +53,7 @@ boolean showCheckBox = DLFileEntryPermission.contains(permissionChecker, fileEnt
 		</span>
 
 		<span class="entry-title">
-			<%= fileEntry.getTitle() %>
+			<%= DLUtil.getTitle(fileEntry, showExtension) %>
 
 			<c:if test="<%= latestFileVersion.isDraft() || latestFileVersion.isPending() %>">
 

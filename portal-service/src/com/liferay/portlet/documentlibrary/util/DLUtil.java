@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -73,6 +74,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Brian Wing Shun Chan
  * @author Julio Camarero
+ * @author Sergio González
  */
 public class DLUtil {
 
@@ -535,6 +537,28 @@ public class DLUtil {
 		return sb.toString();
 	}
 
+	public static String getTitle(FileEntry fileEntry, boolean showExtension) {
+		if (fileEntry == null) {
+			return StringPool.BLANK;
+		}
+
+		String title = fileEntry.getTitle();
+
+		return _getTitle(title, showExtension);
+	}
+
+	public static String getTitle(
+		FileVersion fileVersion, boolean showExtension) {
+
+		if (fileVersion == null) {
+			return StringPool.BLANK;
+		}
+
+		String title = fileVersion.getTitle();
+
+		return _getTitle(title, showExtension);
+	}
+
 	public static String getWebDavURL(
 			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry)
 		throws PortalException, SystemException {
@@ -583,6 +607,14 @@ public class DLUtil {
 			portletPreferences.getValue(
 				"rootFolderId",
 				String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)));
+	}
+
+	private static String _getTitle(String title, boolean showExtension) {
+		if (showExtension) {
+			return title;
+		}
+
+		return FileUtil.stripExtension(title);
 	}
 
 	private DLUtil() {

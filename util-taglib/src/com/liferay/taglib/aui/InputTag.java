@@ -124,7 +124,7 @@ public class InputTag extends BaseInputTag {
 
 		Object bean = getBean();
 
-		if (bean == null) {
+		if (bean == null && !getIgnoreBeanValue()) {
 			bean = pageContext.getAttribute("aui:model-context:bean");
 		}
 
