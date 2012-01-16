@@ -159,7 +159,7 @@ if (folder != null) {
 		sb.append("selectFileEntry('");
 		sb.append(fileEntry.getFileEntryId());
 		sb.append("', '");
-		sb.append(UnicodeFormatter.toString(fileEntry.getTitle()));
+		sb.append(UnicodeFormatter.toString(DLUtil.getTitle(fileEntry, showExtension)));
 		sb.append("'); window.close();");
 
 		String rowHREF = sb.toString();
@@ -169,7 +169,7 @@ if (folder != null) {
 		sb.setIndex(0);
 
 		sb.append(DLUtil.getFileEntryImage(fileEntry, themeDisplay));
-		sb.append(fileEntry.getTitle());
+		sb.append(DLUtil.getTitle(fileEntry, showExtension));
 
 		if (Validator.isNotNull(fileEntry.getDescription())) {
 			sb.append("<br />");

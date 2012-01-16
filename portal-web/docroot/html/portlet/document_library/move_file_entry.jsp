@@ -84,7 +84,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 
 	<liferay-ui:header
 		backURL="<%= redirect %>"
-		title='<%= LanguageUtil.get(pageContext, "move") + StringPool.SPACE + fileEntry.getTitle() %>'
+		title='<%= LanguageUtil.get(pageContext, "move") + StringPool.SPACE + DLUtil.getTitle(fileEntry, showExtension) %>'
 	/>
 
 	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />

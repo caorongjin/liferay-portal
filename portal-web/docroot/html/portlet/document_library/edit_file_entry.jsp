@@ -150,7 +150,7 @@ boolean localizeTitle = true;
 String headerTitle = LanguageUtil.get(pageContext, "new-document");
 
 if (fileVersion != null) {
-	headerTitle = fileVersion.getTitle();
+	headerTitle = DLUtil.getTitle(fileVersion, showExtension);
 	localizeTitle= false;
 }
 else if (dlFileEntryType != null) {
@@ -272,7 +272,7 @@ else if (dlFileEntryType != null) {
 			</aui:validator>
 		</aui:input>
 
-		<aui:input name="title">
+		<aui:input ignoreBeanValue="<%= true %>" name="title" value="<%= DLUtil.getTitle(fileVersion, false) %>">
 			<aui:validator errorMessage="you-must-specify-a-file-or-a-title" name="custom">
 				function(val, fieldNode, ruleValue) {
 					return ((val != '') || A.one('#<portlet:namespace />file').val() != '');
