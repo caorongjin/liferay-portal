@@ -122,12 +122,16 @@ public class DLFileEntryLocalServiceImpl
 			user.getCompanyId(), folderId);
 		String name = String.valueOf(
 			counterLocalService.increment(DLFileEntry.class.getName()));
-		String extension = getExtension(title, sourceFileName);
+		String extension = FileUtil.getExtension(sourceFileName);
 		fileEntryTypeId = getFileEntryTypeId(
 			DLUtil.getGroupIds(groupId), folderId, fileEntryTypeId);
 		Date now = new Date();
 
-		validateFile(groupId, folderId, title, extension, file, is);
+		if (Validator.isNotNull(extension)) {
+			title.concat(StringPool.PERIOD).concat(extension);
+		}
+
+		validateFile(groupId, folderId, title, file, is);
 
 		long fileEntryId = counterLocalService.increment();
 
@@ -918,7 +922,7 @@ public class DLFileEntryLocalServiceImpl
 		DLFileEntry dlFileEntry = dlFileEntryPersistence.findByPrimaryKey(
 			fileEntryId);
 
-		String extension = getExtension(title, sourceFileName);
+		String extension = FileUtil.getExtension(sourceFileName);
 
 		String extraSettings = StringPool.BLANK;
 
@@ -1304,14 +1308,6 @@ public class DLFileEntryLocalServiceImpl
 		indexer.delete(dlFileEntry);
 	}
 
-	protected String getExtension(String title, String sourceFileName) {
-		if (Validator.isNull(sourceFileName)) {
-			sourceFileName = title;
-		}
-
-		return FileUtil.getExtension(sourceFileName);
-	}
-
 	protected Long getFileEntryTypeId(
 			long[] groupIds, long folderId, long fileEntryTypeId)
 		throws PortalException, SystemException {
@@ -1507,6 +1503,9 @@ public class DLFileEntryLocalServiceImpl
 					title = dlFileEntry.getTitle();
 				}
 			}
+			else if (Validator.isNotNull(extension)) {
+				title = title.concat(StringPool.PERIOD).concat(extension);
+			}
 
 			Date now = new Date();
 
@@ -1689,19 +1688,17 @@ public class DLFileEntryLocalServiceImpl
 	}
 
 	protected void validateFile(
-			long groupId, long folderId, String title, String extension,
-			File file, InputStream is)
+			long groupId, long folderId, String title, File file,
+			InputStream is)
 		throws PortalException, SystemException {
 
-		String fileName = title + StringPool.PERIOD + extension;
-
-		validateFileName(fileName);
+		validateFileName(title);
 
 		if (file != null) {
-			DLStoreUtil.validate(fileName, true, file);
+			DLStoreUtil.validate(title, true, file);
 		}
 		else {
-			DLStoreUtil.validate(fileName, true, is);
+			DLStoreUtil.validate(title, true, is);
 		}
 
 		validateFile(groupId, folderId, 0, title);

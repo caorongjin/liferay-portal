@@ -127,6 +127,7 @@ if (rootFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 	}
 }
 
+boolean showExtension = PrefsParamUtil.getBoolean(preferences, request, "showExtension");
 boolean showFoldersSearch = PrefsParamUtil.getBoolean(preferences, request, "showFoldersSearch", true);
 
 String portletId = portletDisplay.getId();

@@ -111,6 +111,7 @@ import javax.servlet.http.HttpSession;
 /**
  * @author Alexander Chow
  * @author Brian Wing Shun Chan
+ * @author Sergio González
  */
 public class WebServerServlet extends HttpServlet {
 
@@ -782,14 +783,6 @@ public class WebServerServlet extends HttpServlet {
 
 		String fileName = fileVersion.getTitle();
 
-		String extension = fileVersion.getExtension();
-
-		if (Validator.isNotNull(extension) &&
-			!fileName.endsWith(StringPool.PERIOD + extension)) {
-
-			fileName += StringPool.PERIOD + extension;
-		}
-
 		boolean converted = false;
 
 		String targetExtension = ParamUtil.getString(
@@ -919,7 +912,8 @@ public class WebServerServlet extends HttpServlet {
 
 			if (Validator.isNotNull(targetExtension)) {
 				File convertedFile = DocumentConversionUtil.convert(
-					tempFileId, inputStream, extension, targetExtension);
+					tempFileId, inputStream, fileVersion.getExtension(),
+					targetExtension);
 
 				if (convertedFile != null) {
 					fileName = FileUtil.stripExtension(fileName).concat(
