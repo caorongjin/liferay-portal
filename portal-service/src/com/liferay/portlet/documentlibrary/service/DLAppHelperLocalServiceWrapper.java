@@ -152,21 +152,23 @@ public class DLAppHelperLocalServiceWrapper implements DLAppHelperLocalService,
 	public void updateFileEntry(long userId,
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
 		com.liferay.portal.kernel.repository.model.FileVersion fileVersion,
+		com.liferay.portal.kernel.repository.model.FileVersion copyFromVersion,
 		long assetClassPk)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlAppHelperLocalService.updateFileEntry(userId, fileEntry,
-			fileVersion, assetClassPk);
+			fileVersion, copyFromVersion, assetClassPk);
 	}
 
 	public void updateFileEntry(long userId,
 		com.liferay.portal.kernel.repository.model.FileEntry fileEntry,
 		com.liferay.portal.kernel.repository.model.FileVersion fileVersion,
+		com.liferay.portal.kernel.repository.model.FileVersion copyFromVersion,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_dlAppHelperLocalService.updateFileEntry(userId, fileEntry,
-			fileVersion, serviceContext);
+			fileVersion, copyFromVersion, serviceContext);
 	}
 
 	public void updateFolder(

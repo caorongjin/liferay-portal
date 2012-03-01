@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -66,6 +68,39 @@ public class DLProcessorRegistryImpl implements DLProcessorRegistry {
 
 		for (DLProcessor dlProcessor : _dlProcessors) {
 			dlProcessor.cleanUp(fileVersion);
+		}
+	}
+
+	public void copy(FileEntry fileEntry, FileVersion copyFromVersion) {
+
+		if (!DLProcessorThreadLocal.isEnabled()) {
+			return;
+		}
+
+		if ((fileEntry == null) || (fileEntry.getSize() == 0) ||
+			(copyFromVersion == null)) {
+			return;
+		}
+
+		FileVersion latestFileVersion = _getLatestFileVersion(fileEntry);
+
+		if (latestFileVersion == null) {
+			return;
+		}
+
+		for (String dlProcessorClassName : _DL_FILE_ENTRY_PROCESSORS) {
+			DLProcessor dlProcessor = (DLProcessor)InstancePool.get(
+				dlProcessorClassName);
+
+			if (dlProcessor.isSupported(latestFileVersion)) {
+				dlProcessor.copy(copyFromVersion, latestFileVersion);
+			}
+		}
+
+		for (DLProcessor dlProcessor : _dlProcessors) {
+			if (dlProcessor.isSupported(latestFileVersion)) {
+				dlProcessor.copy(copyFromVersion, latestFileVersion);
+			}
 		}
 	}
 
