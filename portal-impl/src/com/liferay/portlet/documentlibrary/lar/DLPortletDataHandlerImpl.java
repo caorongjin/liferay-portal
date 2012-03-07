@@ -1066,6 +1066,9 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 			dlFileEntryType.getUuid(), portletDataContext.getScopeGroupId(),
 			dlFileEntryType.getName(), 2);
 
+		ServiceContext serviceContext = portletDataContext.createServiceContext(
+			path, dlFileEntryType, _NAMESPACE);
+
 		List<Element> structureElements = fileEntryTypeElement.elements(
 			"structure");
 
@@ -1084,10 +1087,13 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 				ddmStructureUuids[i], portletDataContext.getScopeGroupId());
 
 			ddmStrutureIds[i] = existingStructure.getStructureId();
-		}
 
-		ServiceContext serviceContext = portletDataContext.createServiceContext(
-			path, dlFileEntryType, _NAMESPACE);
+			String structureKey = existingStructure.getStructureKey();
+
+			if (structureKey.startsWith("auto_")) {
+				serviceContext.setAttribute("xsd", existingStructure.getXsd());
+			}
+		}
 
 		DLFileEntryType importedDLFileEntryType = null;
 
