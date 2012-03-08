@@ -112,6 +112,61 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		deleteFiles(fileVersion, getThumbnailType());
 	}
 
+	public void copy(FileVersion srcVersion, FileVersion destVersion) {
+		try {
+			if (isThumbnailEnabled(THUMBNAIL_INDEX_DEFAULT)) {
+				if (hasThumbnail(srcVersion, THUMBNAIL_INDEX_DEFAULT)) {
+
+					File file = doGetThumbnail(
+						srcVersion, THUMBNAIL_INDEX_DEFAULT);
+
+					InputStream is = new FileInputStream(file);
+
+					String thumbnailFilePath = getThumbnailFilePath(destVersion,
+						getThumbnailType(destVersion), THUMBNAIL_INDEX_DEFAULT);
+
+					addFileToStore(destVersion.getCompanyId(), THUMBNAIL_PATH,
+						thumbnailFilePath, is);
+				}
+			}
+
+			if (isThumbnailEnabled(THUMBNAIL_INDEX_CUSTOM_1)) {
+				if (hasThumbnail(srcVersion, THUMBNAIL_INDEX_CUSTOM_1)) {
+
+					File file = doGetThumbnail(
+						srcVersion, THUMBNAIL_INDEX_CUSTOM_1);
+
+					InputStream is = new FileInputStream(file);
+
+					String thumbnailFilePath = getThumbnailFilePath(destVersion,
+						getThumbnailType(destVersion), THUMBNAIL_INDEX_CUSTOM_1);
+
+					addFileToStore(destVersion.getCompanyId(), THUMBNAIL_PATH,
+						thumbnailFilePath, is);
+				}
+			}
+
+			if (isThumbnailEnabled(THUMBNAIL_INDEX_CUSTOM_2)) {
+				if (hasThumbnail(srcVersion, THUMBNAIL_INDEX_CUSTOM_2)) {
+
+					File file = doGetThumbnail(
+						srcVersion, THUMBNAIL_INDEX_CUSTOM_2);
+
+					InputStream is = new FileInputStream(file);
+
+					String thumbnailFilePath = getThumbnailFilePath(destVersion,
+						getThumbnailType(destVersion), THUMBNAIL_INDEX_CUSTOM_2);
+
+					addFileToStore(destVersion.getCompanyId(), THUMBNAIL_PATH,
+						thumbnailFilePath, is);
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+	}
+
 	public boolean isSupported(FileVersion fileVersion) {
 		if (fileVersion == null) {
 			return false;

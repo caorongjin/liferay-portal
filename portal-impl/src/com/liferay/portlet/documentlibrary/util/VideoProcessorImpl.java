@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
@@ -71,6 +72,30 @@ public class VideoProcessorImpl
 
 	public static VideoProcessorImpl getInstance() {
 		return _instance;
+	}
+
+	public void copy(FileVersion srcVersion, FileVersion destVersion){
+
+		super.copy(srcVersion, destVersion);
+
+		try {
+			for (int i = 0; i < _PREVIEW_TYPES.length; i++) {
+				if (_hasPreview(srcVersion, _PREVIEW_TYPES[i])) {
+
+					String previewFilePath = getPreviewFilePath(destVersion,
+						_PREVIEW_TYPES[i]);
+
+					InputStream is = doGetPreviewAsStream(srcVersion,
+						_PREVIEW_TYPES[i]);
+
+					addFileToStore(destVersion.getCompanyId(), PREVIEW_PATH,
+						previewFilePath, is);
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
 	}
 
 	public void exportGeneratedFiles(

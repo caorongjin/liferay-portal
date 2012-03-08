@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
@@ -27,6 +29,8 @@ public interface DLProcessorRegistry {
 	public void cleanUp(FileEntry fileEntry);
 
 	public void cleanUp(FileVersion fileVersion);
+
+	public void copy(FileEntry fileEntry, FileVersion copyFromVersion);
 
 	public void exportGeneratedFiles(
 			PortletDataContext portletDataContext, FileEntry fileEntry,
