@@ -28,6 +28,8 @@ public interface DLProcessorRegistry {
 
 	public void cleanUp(FileVersion fileVersion);
 
+	public void copy(FileEntry fileEntry, FileVersion copyFromVersion);
+
 	public void exportGeneratedFiles(
 			PortletDataContext portletDataContext, FileEntry fileEntry,
 			Element fileEntryElement)
