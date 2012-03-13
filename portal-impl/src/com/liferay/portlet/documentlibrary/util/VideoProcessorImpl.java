@@ -73,6 +73,32 @@ public class VideoProcessorImpl
 		return _instance;
 	}
 
+	public void copy(FileVersion srcVersion, FileVersion destVersion) {
+
+		super.copy(srcVersion, destVersion);
+
+		try {
+			for (int i = 0; i < _PREVIEW_TYPES.length; i++) {
+				if (_hasPreview(srcVersion, _PREVIEW_TYPES[i]) &&
+					!_hasPreview(destVersion, _PREVIEW_TYPES[i])) {
+
+					String previewFilePath = getPreviewFilePath(
+						destVersion, _PREVIEW_TYPES[i]);
+
+					InputStream is = doGetPreviewAsStream(
+						srcVersion, _PREVIEW_TYPES[i]);
+
+					addFileToStore(
+						destVersion.getCompanyId(), PREVIEW_PATH,
+						previewFilePath, is);
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+	}
+
 	public void exportGeneratedFiles(
 			PortletDataContext portletDataContext, FileEntry fileEntry,
 			Element fileEntryElement)
