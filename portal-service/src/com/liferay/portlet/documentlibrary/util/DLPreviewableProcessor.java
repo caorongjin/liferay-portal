@@ -195,6 +195,10 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		catch (DuplicateDirectoryException dde) {
 		}
 
+		if (DLStoreUtil.hasFile(companyId, REPOSITORY_ID, filePath)) {
+			DLStoreUtil.deleteFile(companyId, REPOSITORY_ID, filePath);
+		}
+
 		DLStoreUtil.addFile(companyId, REPOSITORY_ID, filePath, srcFile);
 	}
 
@@ -206,6 +210,10 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			DLStoreUtil.addDirectory(companyId, REPOSITORY_ID, dirName);
 		}
 		catch (DuplicateDirectoryException dde) {
+		}
+
+		if (DLStoreUtil.hasFile(companyId, REPOSITORY_ID, filePath)) {
+			DLStoreUtil.deleteFile(companyId, REPOSITORY_ID, filePath);
 		}
 
 		DLStoreUtil.addFile(companyId, REPOSITORY_ID, filePath, is);
