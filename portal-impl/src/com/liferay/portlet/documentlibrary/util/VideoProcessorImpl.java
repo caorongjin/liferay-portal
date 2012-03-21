@@ -124,6 +124,11 @@ public class VideoProcessorImpl
 		return hasVideo;
 	}
 
+	public boolean isProcessed(FileVersion fileVersion) {
+		return _instance._fileVersionIds.contains(
+			fileVersion.getFileVersionId());
+	}
+
 	public boolean isSupported(String mimeType) {
 		if (Validator.isNull(mimeType)) {
 			return false;
