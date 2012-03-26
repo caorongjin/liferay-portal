@@ -67,6 +67,9 @@ public class RawMetadataProcessorImpl
 	public void cleanUp(FileVersion fileVersion) {
 	}
 
+	public void copy(FileVersion srcVersion, FileVersion destVersion) {
+	}
+
 	public void exportGeneratedFiles(
 			PortletDataContext portletDataContext, FileEntry fileEntry,
 			Element fileEntryElement)
@@ -93,6 +96,10 @@ public class RawMetadataProcessorImpl
 		throws Exception {
 
 		return;
+	}
+
+	public boolean isProcessed(FileVersion fileVersion) {
+		return false;
 	}
 
 	public boolean isSupported(FileVersion fileVersion) {

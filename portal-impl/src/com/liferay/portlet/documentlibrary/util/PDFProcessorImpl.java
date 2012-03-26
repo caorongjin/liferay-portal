@@ -213,6 +213,11 @@ public class PDFProcessorImpl
 		return false;
 	}
 
+	public boolean isProcessed(FileVersion fileVersion) {
+		return _instance._fileVersionIds.contains(
+			fileVersion.getFileVersionId());
+	}
+
 	public boolean isSupported(String mimeType) {
 		if (Validator.isNull(mimeType)) {
 			return false;
@@ -252,6 +257,34 @@ public class PDFProcessorImpl
 
 	public void trigger(FileVersion fileVersion) {
 		Initializer._initializedInstance._queueGeneration(fileVersion);
+	}
+
+	protected void doCopyPreviews(
+		FileVersion srcVersion, FileVersion destVersion) {
+
+		if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED) {
+			try {
+				if (DLStoreUtil.hasFile(
+					srcVersion.getCompanyId(), REPOSITORY_ID,
+					getPreviewFilePath(srcVersion, 1)) &&
+					!DLStoreUtil.hasFile(
+						destVersion.getCompanyId(), REPOSITORY_ID,
+						getPreviewFilePath(destVersion, 1))) {
+
+					String previewFilePath = getPreviewFilePath(destVersion, 1);
+
+					InputStream is = doGetPreviewAsStream(
+						srcVersion, 1, PREVIEW_TYPE);
+
+					addFileToStore(
+						destVersion.getCompanyId(), PREVIEW_PATH,
+						previewFilePath, is);
+				}
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
 	}
 
 	@Override
