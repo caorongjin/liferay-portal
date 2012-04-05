@@ -558,7 +558,9 @@ public class DLUtil {
 				thumbnailQueryString = "&videoThumbnail=1";
 			}
 
-			if (Validator.isNotNull(thumbnailQueryString)) {
+			if (Validator.isNotNull(thumbnailQueryString) &&
+				!fileEntry.isCheckedOut()) {
+
 				thumbnailSrc = getPreviewURL(
 					fileEntry, fileVersion, themeDisplay, thumbnailQueryString,
 					true, true);

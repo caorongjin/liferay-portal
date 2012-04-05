@@ -149,6 +149,10 @@ public class DLProcessorRegistryImpl implements DLProcessorRegistry {
 			return;
 		}
 
+		if (fileEntry.isCheckedOut()) {
+			return;
+		}
+
 		FileVersion latestFileVersion = _getLatestFileVersion(fileEntry);
 
 		if (latestFileVersion == null) {
