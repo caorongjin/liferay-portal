@@ -241,7 +241,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 
 				<aui:model-context bean="<%= fileVersion %>" model="<%= DLFileVersion.class %>" />
 
-				<c:if test="<%= PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED %>">
+				<c:if test="<%= PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED && !fileEntry.isCheckedOut() %>">
 					<div>
 
 						<%
