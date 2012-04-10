@@ -259,8 +259,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 	public void deleteEntry(BlogsEntry entry)
 		throws PortalException, SystemException {
 
-		socialActivityCounterLocalService.enableActivityCounters(
-			BlogsEntry.class.getName(), entry.getEntryId());
+		//socialActivityCounterLocal.enableCounters(//	CLASS_NAME, classPK);
 
 		// Entry
 

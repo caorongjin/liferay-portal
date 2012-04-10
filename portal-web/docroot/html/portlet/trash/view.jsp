@@ -21,15 +21,15 @@ int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.
 %>
 
 <aui:layout>
-	<liferay-ui:success key="delete_entries" message="all-entries-have-been-deleted-sucessfully"/>
-	<liferay-ui:success key="restore_entries" message="all-entries-have-been-restored-sucessfully"/>
+	<liferay-ui:success key="delete_entries" message="all-entries-have-been-deleted-sucessfully" />
+	<liferay-ui:success key="restore_entries" message="all-entries-have-been-restored-sucessfully" />
 
 	<portlet:actionURL var="processTrashURL">
 		<portlet:param name="struts_action" value="/trash/process_trash" />
 	</portlet:actionURL>
 
 	<aui:form action='<%= processTrashURL %>' method="post" name="fm" onSubmit="event.preventDefault();">
-		<aui:input name="<%= Constants.CMD %>" type="hidden" value=""/>
+		<aui:input name="<%= Constants.CMD %>" type="hidden" value="" />
 
 		<c:if test="<%= trashEntriesCount > 0 %>">
 			<aui:button-row>
@@ -72,7 +72,7 @@ int trashEntriesCount = TrashEntryLocalServiceUtil.getEntriesCount(themeDisplay.
 
 				<liferay-ui:search-container-column-text
 					name="type"
-					value="<%= LanguageUtil.get(pageContext, assetRendererFactory.getType())%>"
+					value="<%= LanguageUtil.get(pageContext, assetRendererFactory.getType()) %>"
 				/>
 
 				<liferay-ui:search-container-column-text
