@@ -499,8 +499,8 @@ public class DLAppHelperLocalServiceImpl
 	}
 
 	public void updateFileEntry(
-			long userId, FileEntry fileEntry, FileVersion fileVersion,
-			long assetClassPk)
+			long userId, FileEntry fileEntry, FileVersion copyFromVersion,
+			FileVersion fileVersion, long assetClassPk)
 		throws PortalException, SystemException {
 
 		boolean updateAsset = true;
@@ -515,12 +515,16 @@ public class DLAppHelperLocalServiceImpl
 			updateAsset(userId, fileEntry, fileVersion, assetClassPk);
 		}
 
-		registerDLProcessorCallback(fileEntry);
+		if (copyFromVersion != null) {
+			DLProcessorRegistryUtil.copy(fileEntry, copyFromVersion);
+		}else {
+			registerDLProcessorCallback(fileEntry);
+		}
 	}
 
 	public void updateFileEntry(
-			long userId, FileEntry fileEntry, FileVersion fileVersion,
-			ServiceContext serviceContext)
+			long userId, FileEntry fileEntry, FileVersion copyFromVersion,
+			FileVersion fileVersion, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
 		updateAsset(
@@ -529,7 +533,11 @@ public class DLAppHelperLocalServiceImpl
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
 
-		registerDLProcessorCallback(fileEntry);
+		if (copyFromVersion != null) {
+			DLProcessorRegistryUtil.copy(fileEntry, copyFromVersion);
+		}else {
+			registerDLProcessorCallback(fileEntry);
+		}
 	}
 
 	public void updateFolder(Folder folder, ServiceContext serviceContext)
