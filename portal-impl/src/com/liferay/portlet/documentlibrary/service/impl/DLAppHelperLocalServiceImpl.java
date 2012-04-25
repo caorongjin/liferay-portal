@@ -651,20 +651,18 @@ public class DLAppHelperLocalServiceImpl
 					0);
 			}
 		}
-		else {
+		else if (newStatus == WorkflowConstants.STATUS_IN_TRASH) {
+			assetEntryLocalService.moveEntryToTrash(
+				DLFileEntryConstants.getClassName(),
+				fileEntry.getFileEntryId());
+		}
 
-			// Asset
+		// Asset
 
-			if (newStatus == WorkflowConstants.STATUS_IN_TRASH) {
-				assetEntryLocalService.moveEntryToTrash(
-					DLFileEntryConstants.getClassName(),
-					fileEntry.getFileEntryId());
-			}
-			else if (Validator.isNull(fileEntry.getVersion())) {
-				assetEntryLocalService.updateVisible(
-					DLFileEntryConstants.getClassName(),
-					fileEntry.getFileEntryId(), false);
-			}
+		else if (Validator.isNotNull(fileEntry.getVersion())) {
+			assetEntryLocalService.updateVisible(
+				DLFileEntryConstants.getClassName(),
+				fileEntry.getFileEntryId(), false);
 		}
 	}
 
