@@ -1,3 +1,4 @@
+<%@ page import="com.liferay.portlet.documentlibrary.util.DLAppUtil" %>
 <%--
 /**
  * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
@@ -30,7 +31,7 @@ FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_F
 long fileEntryId = fileEntry.getFileEntryId();
 long folderId = fileEntry.getFolderId();
 String extension = fileEntry.getExtension();
-String title = fileEntry.getTitle();
+String title = DLAppUtil.stripTrashNamespace(fileEntry.getTitle());
 
 Folder folder = fileEntry.getFolder();
 FileVersion fileVersion = (FileVersion)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_VERSION);
@@ -122,7 +123,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 	<liferay-ui:header
 		backURL="<%= redirect %>"
 		localizeTitle="<%= false %>"
-		title="<%= fileEntry.getTitle() %>"
+		title="<%= DLAppUtil.stripTrashNamespace(fileEntry.getTitle()) %>"
 	/>
 </c:if>
 
@@ -133,6 +134,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 				<div class="lfr-header-row">
 					<div class="lfr-header-row-content">
 						<aui:button-row cssClass="edit-toolbar" id='<%= renderResponse.getNamespace() + "fileEntryToolbar" %>' />
+					</div>
 					</div>
 				</div>
 			</c:if>
