@@ -27,7 +27,10 @@ import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterLinkUtil;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
+import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.dao.shard.ShardUtil;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.executor.PortalExecutorManagerUtil;
 import com.liferay.portal.kernel.image.ImageMagickUtil;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncPrintWriter;
@@ -36,8 +39,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.mail.Account;
+import com.liferay.portal.kernel.messaging.BaseAsyncDestination;
+import com.liferay.portal.kernel.messaging.Destination;
 import com.liferay.portal.kernel.messaging.DestinationNames;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.messaging.proxy.MessageValuesThreadLocal;
 import com.liferay.portal.kernel.scripting.ScriptingException;
 import com.liferay.portal.kernel.scripting.ScriptingUtil;
 import com.liferay.portal.kernel.search.Indexer;
@@ -51,6 +58,7 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.ThreadUtil;
@@ -60,7 +68,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
 import com.liferay.portal.kernel.xuggler.XugglerInstallStatus;
 import com.liferay.portal.kernel.xuggler.XugglerUtil;
-import com.liferay.portal.messaging.proxy.MessageValuesThreadLocal;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.search.lucene.LuceneHelperUtil;
 import com.liferay.portal.search.lucene.LuceneIndexer;
@@ -77,6 +84,7 @@ import com.liferay.portal.util.MaintenanceUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.ShutdownUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.ActionResponseImpl;
@@ -87,8 +95,12 @@ import com.liferay.util.log4j.Log4JUtil;
 import java.io.File;
 
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -108,6 +120,7 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class EditServerAction extends PortletAction {
 
@@ -342,12 +355,17 @@ public class EditServerAction extends PortletAction {
 				ClusterLinkUtil.CLUSTER_FORWARD_MESSAGE, true);
 		}
 
+		Set<String> usedSearchEngineIds = new HashSet<String>();
+
 		if (Validator.isNull(portletId)) {
 			for (long companyId : companyIds) {
 				try {
-					LuceneIndexer indexer = new LuceneIndexer(companyId);
+					LuceneIndexer luceneIndexer = new LuceneIndexer(companyId);
 
-					indexer.reindex();
+					luceneIndexer.reindex();
+
+					usedSearchEngineIds.addAll(
+						luceneIndexer.getUsedSearchEngineIds());
 				}
 				catch (Exception e) {
 					_log.error(e, e);
@@ -378,6 +396,8 @@ public class EditServerAction extends PortletAction {
 
 						indexer.reindex(
 							new String[] {String.valueOf(companyId)});
+
+						usedSearchEngineIds.add(indexer.getSearchEngineId());
 					}
 					catch (Exception e) {
 						_log.error(e, e);
@@ -389,19 +409,29 @@ public class EditServerAction extends PortletAction {
 		}
 
 		if (LuceneHelperUtil.isLoadIndexFromClusterEnabled()) {
-			Address localClusterNodeAddress =
-				ClusterExecutorUtil.getLocalClusterNodeAddress();
+			Set<BaseAsyncDestination> searchWriterDestinations =
+				new HashSet<BaseAsyncDestination>();
 
-			ClusterRequest clusterRequest =
-				ClusterRequest.createMulticastRequest(
-					new MethodHandler(
-						_loadIndexesFromClusterMethodKey, companyIds,
-						localClusterNodeAddress),
-					true);
+			MessageBus messageBus = MessageBusUtil.getMessageBus();
 
-			ClusterExecutorUtil.execute(clusterRequest);
+			for (String usedSearchEngineId : usedSearchEngineIds) {
+				String searchWriterDestinationName =
+					SearchEngineUtil.getSearchWriterDestinationName(
+						usedSearchEngineId);
 
-			return;
+				Destination destination = messageBus.getDestination(
+					searchWriterDestinationName);
+
+				if (destination instanceof BaseAsyncDestination) {
+					BaseAsyncDestination baseAsyncDestination =
+						(BaseAsyncDestination)destination;
+
+					searchWriterDestinations.add(baseAsyncDestination);
+				}
+			}
+
+			submitClusterIndexLoadingSyncJob(
+				searchWriterDestinations, companyIds);
 		}
 	}
 
@@ -457,6 +487,72 @@ public class EditServerAction extends PortletAction {
 		else {
 			ShutdownUtil.shutdown(minutes, message);
 		}
+	}
+
+	protected void submitClusterIndexLoadingSyncJob(
+			Set<BaseAsyncDestination> baseAsyncDestinations, long[] companyIds)
+		throws Exception {
+
+		if (_log.isInfoEnabled()) {
+			StringBundler sb = new StringBundler(
+				baseAsyncDestinations.size() + 1);
+
+			sb.append("[");
+
+			for (BaseAsyncDestination baseAsyncDestination :
+					baseAsyncDestinations) {
+
+				sb.append(baseAsyncDestination.getName());
+				sb.append(", ");
+			}
+
+			sb.setStringAt("]", sb.index() - 1);
+
+			_log.info(
+				"Synchronizecluster index loading for destinations " +
+					sb.toString());
+		}
+
+		int totalWorkersMaxSize = 0;
+
+		for (BaseAsyncDestination baseAsyncDestination :
+				baseAsyncDestinations) {
+
+			totalWorkersMaxSize += baseAsyncDestination.getWorkersMaxSize();
+		}
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				"There are " + totalWorkersMaxSize +
+					" synchronization threads");
+		}
+
+		CountDownLatch countDownLatch = new CountDownLatch(
+			totalWorkersMaxSize + 1);
+
+		ClusterLoadingSyncJob slaveClusterLoadingSyncJob =
+			new ClusterLoadingSyncJob(companyIds, countDownLatch, false);
+
+		for (BaseAsyncDestination baseAsyncDestination :
+				baseAsyncDestinations) {
+
+			ThreadPoolExecutor threadPoolExecutor =
+				PortalExecutorManagerUtil.getPortalExecutor(
+					baseAsyncDestination.getName());
+
+			for (int i = 0; i < baseAsyncDestination.getWorkersMaxSize(); i++) {
+				threadPoolExecutor.execute(slaveClusterLoadingSyncJob);
+			}
+		}
+
+		ClusterLoadingSyncJob masterClusterLoadingSyncJob =
+			new ClusterLoadingSyncJob(companyIds, countDownLatch, true);
+
+		ThreadPoolExecutor threadPoolExecutor =
+			PortalExecutorManagerUtil.getPortalExecutor(
+				EditServerAction.class.getName());
+
+		threadPoolExecutor.execute(masterClusterLoadingSyncJob);
 	}
 
 	protected void threadDump() throws Exception {
@@ -752,5 +848,110 @@ public class EditServerAction extends PortletAction {
 	private static MethodKey _loadIndexesFromClusterMethodKey = new MethodKey(
 		LuceneClusterUtil.class.getName(), "loadIndexesFromCluster",
 		long[].class, Address.class);
+
+	private static class ClusterLoadingSyncJob implements Runnable {
+
+		public ClusterLoadingSyncJob(
+			long[] companyIds, CountDownLatch countDownLatch, boolean master) {
+
+			_companyIds = companyIds;
+			_countDownLatch = countDownLatch;
+			_master = master;
+		}
+
+		public void run() {
+			_countDownLatch.countDown();
+
+			String logPrefix = StringPool.BLANK;
+
+			if (_log.isInfoEnabled()) {
+				Thread currentThread = Thread.currentThread();
+
+				if (_master) {
+					logPrefix =
+						"Monitor thread name " + currentThread.getName() +
+							" with thread ID " + currentThread.getId();
+				}
+				else {
+					logPrefix =
+						"Thread name " + currentThread.getName() +
+							" with thread ID " + currentThread.getId();
+				}
+			}
+
+			if (!_master && _log.isInfoEnabled()) {
+				_log.info(
+					logPrefix + " synchronized on latch. Waiting for others.");
+			}
+
+			try {
+				boolean result = _countDownLatch.await(
+					PropsValues.LUCENE_CLUSTER_INDEX_LOADING_SYNC_TIMEOUT,
+					TimeUnit.MILLISECONDS);
+
+				if (!result) {
+					if (_master) {
+						_log.error(
+							logPrefix + " timed out. Skip cluster index " +
+								"loading notification.");
+
+						return;
+					}
+					else {
+						_log.error(
+							logPrefix + " timed out. You may need to " +
+								"re-trigger a reindex process.");
+					}
+				}
+			}
+			catch (InterruptedException ie) {
+				if (_master) {
+					_log.error(
+						logPrefix + " was interrupted. Skip cluster index " +
+							"loading notification.",
+						ie);
+
+					return;
+				}
+				else {
+					_log.error(
+						logPrefix + " was interrupted. You may need to " +
+							"re-trigger a reindex process.",
+						ie);
+				}
+			}
+
+			if (_master) {
+				Address localClusterNodeAddress =
+					ClusterExecutorUtil.getLocalClusterNodeAddress();
+
+				ClusterRequest clusterRequest =
+					ClusterRequest.createMulticastRequest(
+						new MethodHandler(
+							_loadIndexesFromClusterMethodKey, _companyIds,
+							localClusterNodeAddress),
+						true);
+
+				try {
+					ClusterExecutorUtil.execute(clusterRequest);
+				}
+				catch (SystemException se) {
+					_log.error(
+						"Unable to notify peers to start index loading", se);
+				}
+
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						logPrefix + " unlocked latch. Notified peers to " +
+							"start index loading.");
+				}
+			}
+		}
+
+		private long[] _companyIds;
+		private CountDownLatch _countDownLatch;
+		private boolean _master;
+
+	}
 
 }
