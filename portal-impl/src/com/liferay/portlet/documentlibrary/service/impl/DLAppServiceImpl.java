@@ -46,6 +46,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLAppServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
+import com.liferay.portlet.documentlibrary.service.permission.DLFileShortcutPermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
@@ -2031,6 +2032,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		Repository fromRepository = getRepository(0, fileEntryId, 0);
 		Repository toRepository = getRepository(newFolderId, serviceContext);
 
+		if (newFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			Folder toFolder = toRepository.getFolder(newFolderId);
+
+			if (toFolder.isMountPoint()) {
+				toRepository = getRepository(toFolder.getRepositoryId());
+			}
+		}
+
 		if (fromRepository.getRepositoryId() ==
 				toRepository.getRepositoryId()) {
 
@@ -2077,6 +2086,25 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	}
 
 	/**
+	 * Moves the file shortcut with the primary key to the trash portlet.
+	 *
+	 * @param  fileShortcutId the primary key of the file shortcut
+	 * @throws PortalException if the file shortcut could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public DLFileShortcut moveFileShortcutToTrash(long fileShortcutId)
+		throws PortalException, SystemException {
+
+		DLFileShortcut fileShortcut = getFileShortcut(fileShortcutId);
+
+		DLFileShortcutPermission.check(
+			getPermissionChecker(), fileShortcut, ActionKeys.DELETE);
+
+		return dlAppHelperLocalService.moveFileShortcutToTrash(
+			getUserId(), fileShortcut);
+	}
+
+	/**
 	 * Moves the folder to the new parent folder with the primary key.
 	 *
 	 * @param  folderId the primary key of the folder
@@ -2092,6 +2120,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository fromRepository = getRepository(folderId, 0, 0);
 		Repository toRepository = getRepository(parentFolderId, serviceContext);
+
+		if (parentFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			Folder toFolder = toRepository.getFolder(parentFolderId);
+
+			if (toFolder.isMountPoint()) {
+				toRepository = getRepository(toFolder.getRepositoryId());
+			}
+		}
 
 		if (fromRepository.getRepositoryId() ==
 				toRepository.getRepositoryId()) {
@@ -2194,7 +2230,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	}
 
 	/**
-	 * Moves the file entry with the primary key to the trash portlet.
+	 * Restores the file entry with the primary key from the trash portlet.
 	 *
 	 * @param  fileEntryId the primary key of the file entry
 	 * @throws PortalException if the file entry could not be found
@@ -2221,7 +2257,26 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	}
 
 	/**
-	 * Moves the folder with the primary key to the trash portlet.
+	 * Restores the file shortcut with the primary key from the trash portlet.
+	 *
+	 * @param  fileShortcutId the primary key of the file shortcut
+	 * @throws PortalException if the file shortcut could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void restoreFileShortcutFromTrash(long fileShortcutId)
+		throws PortalException, SystemException {
+
+		DLFileShortcut fileShortcut = getFileShortcut(fileShortcutId);
+
+		DLFileShortcutPermission.check(
+			getPermissionChecker(), fileShortcut, ActionKeys.UPDATE);
+
+		dlAppHelperLocalService.restoreFileShortcutFromTrash(
+			getUserId(), fileShortcut);
+	}
+
+	/**
+	 * Restores the folder with the primary key from the trash portlet.
 	 *
 	 * @param  folderId the primary key of the folder
 	 * @throws PortalException if the folder could not be found

@@ -113,23 +113,21 @@ public class TaskQueue<E> {
 		_putLock.lock();
 
 		try {
-			if (_count.get() < _capacity) {
+
+			// Take a snapshot of count before enqueue
+
+			count = _count.get();
+
+			if (count < _capacity) {
 				_enqueue(element);
 
-				count = _count.getAndIncrement();
+				_count.getAndIncrement();
 
-				_takeLock.lock();
+				// After enqueue, a non-increasing count implies a concurrent
+				// token because there are spare threads
 
-				try {
-					hasWaiterMarker[0] = _takeLock.hasWaiters(
-						_notEmptyCondition);
-
-					if (!hasWaiterMarker[0] && (count >= _count.get())) {
-						hasWaiterMarker[0] = true;
-					}
-				}
-				finally {
-					_takeLock.unlock();
+				if (count >= _count.get()) {
+					hasWaiterMarker[0] = true;
 				}
 			}
 		}
