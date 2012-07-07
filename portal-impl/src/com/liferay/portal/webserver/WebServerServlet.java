@@ -76,6 +76,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
+import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -966,6 +967,10 @@ public class WebServerServlet extends HttpServlet {
 			contentLength = fileVersion.getSize();
 
 			if (Validator.isNotNull(targetExtension)) {
+				if (!_isValidExtension(targetExtension)) {
+					throw new FileExtensionException();
+				}
+
 				File convertedFile = DocumentConversionUtil.convert(
 					tempFileId, inputStream, extension, targetExtension);
 
@@ -1278,6 +1283,16 @@ public class WebServerServlet extends HttpServlet {
 		}
 
 		return user;
+	}
+
+	private boolean _isValidExtension(String extension) {
+		if (extension.contains(StringPool.SLASH) ||
+			extension.contains(StringPool.BACK_SLASH)) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	private static final String _DATE_FORMAT_PATTERN = "d MMM yyyy HH:mm z";
