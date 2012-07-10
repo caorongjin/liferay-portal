@@ -17,88 +17,46 @@
 <%@ include file="/html/portlet/document_library/init.jsp" %>
 
 <%
-String strutsAction = ParamUtil.getString(request, "struts_action");
-
 String cmd = ParamUtil.getString(request, Constants.CMD);
-
-String tabs2 = ParamUtil.getString(request, "tabs2", "version-history");
 
 String redirect = ParamUtil.getString(request, "redirect");
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
-FileEntry fileEntry = (FileEntry)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRY);
+DLFileShortcut fileShortcut = (DLFileShortcut)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUT);
 
-long fileEntryId = BeanParamUtil.getLong(fileEntry, request, "fileEntryId");
+long fileShortcutId = BeanParamUtil.getLong(fileShortcut, request, "fileShortcutId");
 
-long folderId = BeanParamUtil.getLong(fileEntry, request, "folderId");
-
-Lock lock = fileEntry.getLock();
-
-PortletURL portletURL = renderResponse.createRenderURL();
-
-portletURL.setParameter("struts_action", strutsAction);
-portletURL.setParameter("tabs2", tabs2);
-portletURL.setParameter("redirect", redirect);
-portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
+long folderId = BeanParamUtil.getLong(fileShortcut, request, "folderId");
 %>
 
 <c:if test="<%= Validator.isNull(referringPortletResource) %>">
 	<liferay-util:include page="/html/portlet/document_library/top_links.jsp" />
 </c:if>
 
-<c:if test="<%= fileEntry.isCheckedOut() %>">
-	<c:choose>
-		<c:when test="<%= fileEntry.hasLock() %>">
-			<div class="portlet-msg-success">
-				<c:choose>
-					<c:when test="<%= lock.isNeverExpires() %>">
-						<liferay-ui:message key="you-now-have-an-indefinite-lock-on-this-document" />
-					</c:when>
-					<c:otherwise>
-
-						<%
-						String lockExpirationTime = LanguageUtil.getTimeDescription(pageContext, DLFileEntryConstants.LOCK_EXPIRATION_TIME).toLowerCase();
-						%>
-
-						<%= LanguageUtil.format(pageContext, "you-now-have-a-lock-on-this-document", lockExpirationTime, false) %>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</c:when>
-		<c:otherwise>
-			<div class="portlet-msg-error">
-				<%= LanguageUtil.format(pageContext, "you-cannot-modify-this-document-because-it-was-checked-out-by-x-on-x", new Object[] {HtmlUtil.escape(PortalUtil.getUserName(lock.getUserId(), String.valueOf(lock.getUserId()))), dateFormatDateTime.format(lock.getCreateDate())}, false) %>
-			</div>
-		</c:otherwise>
-	</c:choose>
-</c:if>
-
-<portlet:actionURL var="moveFileEntryURL">
-	<portlet:param name="struts_action" value="/document_library/move_file_entry" />
+<portlet:actionURL var="moveFileShortcutURL">
+	<portlet:param name="struts_action" value="/document_library/move_file_shortcut" />
 </portlet:actionURL>
 
-<aui:form action="<%= moveFileEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry(false);" %>'>
+<aui:form action="<%= moveFileShortcutURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileShortcut(false);" %>'>
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= cmd.equals(Constants.MOVE_FROM_TRASH) ? Constants.MOVE_FROM_TRASH : Constants.MOVE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
-	<aui:input name="fileEntryId" type="hidden" value="<%= fileEntryId %>" />
+	<aui:input name="fileShortcutId" type="hidden" value="<%= fileShortcutId %>" />
 	<aui:input name="newFolderId" type="hidden" value="<%= folderId %>" />
 
 	<liferay-ui:header
 		backURL="<%= redirect %>"
-		title='<%= LanguageUtil.get(pageContext, "move") + StringPool.SPACE + fileEntry.getTitle() %>'
+		title='<%= LanguageUtil.get(pageContext, "move") + StringPool.SPACE + fileShortcut.getToTitle() + " (" + LanguageUtil.get(pageContext, "shortcut") + ")" %>'
 	/>
 
-	<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
-	<liferay-ui:error exception="<%= DuplicateFolderNameException.class %>" message="the-folder-you-selected-already-has-an-entry-with-this-name.-please-select-a-different-folder" />
 	<liferay-ui:error exception="<%= NoSuchFolderException.class %>" message="please-enter-a-valid-folder" />
 
-	<aui:model-context bean="<%= fileEntry %>" model="<%= DLFileEntry.class %>" />
+	<aui:model-context bean="<%= fileShortcut %>" model="<%= DLFileShortcut.class %>" />
 
 	<aui:fieldset>
 
 		<%
-		String folderName = StringPool.BLANK;
+		String folderName = null;
 
 		if (folderId > 0) {
 			Folder folder = DLAppLocalServiceUtil.getFolder(folderId);
@@ -143,7 +101,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 		</aui:field-wrapper>
 
 		<aui:button-row>
-			<aui:button disabled="<%= fileEntry.isCheckedOut() && !fileEntry.hasLock() %>" type="submit" value="move" />
+			<aui:button type="submit" value="move" />
 
 			<aui:button href="<%= redirect %>" type="cancel" />
 		</aui:button-row>
@@ -151,7 +109,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 </aui:form>
 
 <aui:script>
-	function <portlet:namespace />saveFileEntry() {
+	function <portlet:namespace />saveFileShortcut() {
 		submitForm(document.<portlet:namespace />fm);
 	}
 
@@ -172,7 +130,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 </aui:script>
 
 <%
-DLUtil.addPortletBreadcrumbEntries(fileEntry, request, renderResponse);
+DLUtil.addPortletBreadcrumbEntries(fileShortcut, request, renderResponse);
 
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "move"), currentURL);
 %>
