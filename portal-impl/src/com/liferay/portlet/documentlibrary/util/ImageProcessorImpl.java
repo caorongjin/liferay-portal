@@ -272,9 +272,7 @@ public class ImageProcessorImpl
 
 			if (renderedImage.getColorModel().getNumComponents() == 4) {
 				RenderedImage convertedRenderedImage =
-					ImageToolUtil.convertCMYKtoRGB(
-						bytes, imageBag.getType(),
-						PropsValues.DL_FILE_ENTRY_PREVIEW_FORK_PROCESS_ENABLED);
+					ImageToolUtil.convertCMYKtoRGB(bytes, imageBag.getType());
 
 				if (convertedRenderedImage != null) {
 					renderedImage = convertedRenderedImage;
