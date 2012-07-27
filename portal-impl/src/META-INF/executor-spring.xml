@@ -93,5 +93,9 @@
 
 	<!-- Process executor -->
 
-	<bean id ="com.liferay.portal.kernel.process.ProcessExecutor" class="com.liferay.portal.kernel.process.ProcessExecutor" />
+	<bean id ="com.liferay.portal.kernel.process.ProcessExecutor" class="com.liferay.portal.kernel.process.ProcessExecutor"/>
+
+    <!-- Native Process executor -->
+
+    <bean id ="com.liferay.portal.kernel.process.NativeProcessExecutor" class="com.liferay.portal.kernel.process.NativeProcessExecutor"/>
 </beans>
