@@ -24,6 +24,7 @@ import java.util.List;
 import jodd.util.StringPool;
 
 import org.im4java.core.ConvertCmd;
+import org.im4java.process.ProcessTask;
 
 /**
  * @author Alexander Chow
@@ -55,6 +56,22 @@ public class LiferayConvertCmd extends ConvertCmd {
 		}
 
 		_instance.run(arguments);
+	}
+
+	public ProcessTask getProcessTask(
+		String globalSearchPath, List<String> resourceLimits,
+		List<String> commandArguments)
+		throws Exception {
+
+		setGlobalSearchPath(globalSearchPath);
+
+		LinkedList<String> arguments = new LinkedList<String>();
+
+		arguments.addAll(_instance.getCommand());
+		arguments.addAll(resourceLimits);
+		arguments.addAll(commandArguments);
+
+		return getProcessTask(arguments);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(LiferayConvertCmd.class);
