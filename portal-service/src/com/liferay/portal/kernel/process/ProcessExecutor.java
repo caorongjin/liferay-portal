@@ -26,11 +26,14 @@ import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringPool;
 
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
@@ -54,8 +57,55 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Shuyang Zhou
+ * @author Ivica Cardic
  */
 public class ProcessExecutor {
+
+	public static <T extends Serializable> Future<T> execute(
+			List<String> arguments,
+			NativeProcessCallable<ReturnProcessCallable<T>> processCallable)
+		throws ProcessException {
+
+		try {
+			ProcessBuilder processBuilder = new ProcessBuilder(
+				arguments.toArray(new String[arguments.size()]));
+
+			processBuilder.redirectErrorStream(true);
+
+			Process process = processBuilder.start();
+
+			SubprocessReactor subprocessReactor =
+				new SubprocessReactor(process, processCallable);
+
+			ExecutorService executorService = _getExecutorService();
+
+			try {
+				Future<ProcessCallable<? extends Serializable>>
+					futureResponseProcessCallable = executorService.submit(
+					subprocessReactor);
+
+				// Consider the newly created process as a managed process only
+				// after the subprocess reactor is taken by the thread pool
+
+				_managedProcesses.add(process);
+
+				if (_log.isInfoEnabled()) {
+					executorService.submit(
+						new NativeProcessLogRunnable(process.getInputStream()));
+				}
+
+				return new ProcessExecutionFutureResult<T>(
+					futureResponseProcessCallable, process);
+			} catch (RejectedExecutionException ree) {
+				process.destroy();
+
+				throw new ProcessException(
+					"Cancelled execution because of a concurrent destroy", ree);
+			}
+		} catch (IOException e) {
+			throw new ProcessException(e);
+		}
+	}
 
 	public static <T extends Serializable> Future<T> execute(
 			String classPath, List<String> arguments,
@@ -411,6 +461,35 @@ public class ProcessExecutor {
 
 	}
 
+	private static class NativeProcessLogRunnable implements Runnable {
+		InputStream is;
+
+		NativeProcessLogRunnable(InputStream is) {
+			this.is = is;
+		}
+
+		public void run() {
+			try {
+				InputStreamReader isr = new InputStreamReader(is);
+				BufferedReader br = new BufferedReader(isr);
+				String line;
+				while ((line = br.readLine()) != null) {
+					_log.info(line);
+				}
+			} catch (IOException ioe) {
+				_log.info(ioe);
+			} finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+					}
+				}
+
+			}
+		}
+	}
+
 	private static class PingbackProcessCallable
 		implements ProcessCallable<String> {
 
@@ -488,87 +567,118 @@ public class ProcessExecutor {
 			}
 		}
 
-		private final Future<ProcessCallable<?>> _future;
+		private final Future<ProcessCallable<? extends Serializable>> _future;
 		private final Process _process;
 
 	}
 
-	private static class SubprocessReactor
-		implements Callable<ProcessCallable<? extends Serializable>> {
+	private static class SubprocessReactor<T extends Serializable>
+		implements Callable<ProcessCallable<T>> {
 
 		public SubprocessReactor(Process process) {
 			_process = process;
+			_processCallable = null;
+			_nativeProcessCall = false;
 		}
 
-		public ProcessCallable<? extends Serializable> call() throws Exception {
-			ProcessCallable<?> resultProcessCallable = null;
+		public SubprocessReactor(
+			Process process,
+			NativeProcessCallable<ReturnProcessCallable<T>> processCallable) {
+			_process = process;
+			_processCallable = processCallable;
+			_nativeProcessCall = true;
+		}
+
+		public ProcessCallable<T> call() throws Exception {
+			ProcessCallable<T> resultProcessCallable = null;
 
 			UnsyncBufferedInputStream unsyncBufferedInputStream =
 				new UnsyncBufferedInputStream(_process.getInputStream());
 
 			try {
-				ObjectInputStream objectInputStream = null;
+				if (!_nativeProcessCall) {
 
-				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
-					new UnsyncByteArrayOutputStream();
+					ObjectInputStream objectInputStream = null;
 
-				while (true) {
-					try {
+					UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+						new UnsyncByteArrayOutputStream();
 
-						// Be ready for a bad header
+					while (true) {
+						try {
 
-						unsyncBufferedInputStream.mark(4);
+							// Be ready for a bad header
 
-						objectInputStream =
-							new PortalClassLoaderObjectInputStream(
-								unsyncBufferedInputStream);
+							unsyncBufferedInputStream.mark(4);
 
-						// Found the beginning of the object input stream. Flush
-						// out corrupted log if necessary.
+							objectInputStream =
+								new PortalClassLoaderObjectInputStream(
+									unsyncBufferedInputStream);
 
-						if (unsyncByteArrayOutputStream.size() > 0) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(
-									"Found corrupt leading log " +
-										unsyncByteArrayOutputStream.toString());
+							// Found the beginning of the object input stream.
+							// Flush out corrupted log if necessary.
+
+							if (unsyncByteArrayOutputStream.size() > 0) {
+								if (_log.isWarnEnabled()) {
+									_log.warn(
+										"Found corrupt leading log " +
+											unsyncByteArrayOutputStream
+												.toString());
+								}
 							}
+
+							unsyncByteArrayOutputStream = null;
+
+							break;
+						}
+						catch (StreamCorruptedException sce) {
+
+							// Collecting bad header as log information
+
+							unsyncBufferedInputStream.reset();
+
+							unsyncByteArrayOutputStream.write(
+								unsyncBufferedInputStream.read());
+						}
+					}
+
+					while (true) {
+						ProcessCallable<T> processCallable =
+							(ProcessCallable<T>)objectInputStream.readObject();
+
+						if ((processCallable instanceof
+								ExceptionProcessCallable) ||
+							(processCallable instanceof
+								ReturnProcessCallable)) {
+
+							resultProcessCallable = processCallable;
+
+							continue;
 						}
 
-						unsyncByteArrayOutputStream = null;
+						Serializable returnValue = processCallable.call();
 
-						break;
+						if (_log.isDebugEnabled()) {
+							_log.debug(
+								"Invoked generic process callable " +
+									processCallable + " with return value " +
+										returnValue);
+						}
 					}
-					catch (StreamCorruptedException sce) {
+				}else {
+					if (_processCallable != null) {
+						InputStream is = _process.getInputStream();
+						try {
+							_processCallable.setInputStream(is);
 
-						// Collecting bad header as log information
-
-						unsyncBufferedInputStream.reset();
-
-						unsyncByteArrayOutputStream.write(
-							unsyncBufferedInputStream.read());
-					}
-				}
-
-				while (true) {
-					ProcessCallable<?> processCallable =
-						(ProcessCallable<?>)objectInputStream.readObject();
-
-					if ((processCallable instanceof ExceptionProcessCallable) ||
-						(processCallable instanceof ReturnProcessCallable<?>)) {
-
-						resultProcessCallable = processCallable;
-
-						continue;
+							resultProcessCallable = _processCallable.call();
+						} finally {
+							is.close();
+						}
+					}else {
+						resultProcessCallable = new ReturnProcessCallable(null);
 					}
 
-					Serializable returnValue = processCallable.call();
-
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"Invoked generic process callable " +
-								processCallable + " with return value " +
-									returnValue);
-					}
+					return resultProcessCallable;
 				}
 			}
 			catch (StreamCorruptedException sce) {
@@ -620,7 +730,10 @@ public class ProcessExecutor {
 			}
 		}
 
+		private final boolean _nativeProcessCall;
 		private final Process _process;
+		private final NativeProcessCallable<ReturnProcessCallable<T>>
+			_processCallable;
 
 	}
 

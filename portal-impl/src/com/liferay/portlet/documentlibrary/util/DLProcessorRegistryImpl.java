@@ -166,7 +166,7 @@ public class DLProcessorRegistryImpl implements DLProcessorRegistry {
 
 		for (DLProcessor dlProcessor : _dlProcessors) {
 			if (dlProcessor.isSupported(latestFileVersion)) {
-				dlProcessor.trigger(latestFileVersion, fileVersion);
+				dlProcessor.trigger(fileVersion, latestFileVersion);
 			}
 		}
 	}
