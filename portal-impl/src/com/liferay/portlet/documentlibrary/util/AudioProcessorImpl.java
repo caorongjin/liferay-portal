@@ -46,11 +46,9 @@ import com.liferay.util.log4j.Log4JUtil;
 import java.io.File;
 import java.io.InputStream;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -59,6 +57,7 @@ import org.apache.commons.lang.time.StopWatch;
  * @author Juan González
  * @author Sergio González
  * @author Mika Koivisto
+ * @author Ivica Cardic
  */
 public class AudioProcessorImpl
 	extends DLPreviewableProcessor implements AudioProcessor {
@@ -133,6 +132,8 @@ public class AudioProcessorImpl
 
 	public void trigger(
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
+
+		super.trigger(sourceFileVersion, destinationFileVersion);
 
 		_instance._queueGeneration(sourceFileVersion, destinationFileVersion);
 	}
@@ -316,7 +317,7 @@ public class AudioProcessorImpl
 		finally {
 			StreamUtil.cleanUp(inputStream);
 
-			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
+			fileVersionIds.remove(destinationFileVersion.getFileVersionId());
 
 			for (int i = 0; i < previewTempFiles.length; i++) {
 				FileUtil.delete(previewTempFiles[i]);
@@ -357,6 +358,11 @@ public class AudioProcessorImpl
 
 				Future<String> future = ProcessExecutor.execute(
 					ClassPathUtil.getPortalClassPath(), processCallable);
+
+				String processIdentity = Long.toString(
+					fileVersion.getFileVersionId());
+
+				managedProcesses.put(processIdentity, future);
 
 				future.get();
 			}
@@ -411,14 +417,14 @@ public class AudioProcessorImpl
 	private void _queueGeneration(
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
 
-		if (_fileVersionIds.contains(
+		if (fileVersionIds.contains(
 				destinationFileVersion.getFileVersionId()) ||
 			!isSupported(destinationFileVersion)) {
 
 			return;
 		}
 
-		_fileVersionIds.add(destinationFileVersion.getFileVersionId());
+		fileVersionIds.add(destinationFileVersion.getFileVersionId());
 
 		sendGenerationMessage(
 			DestinationNames.DOCUMENT_LIBRARY_AUDIO_PROCESSOR,
@@ -439,7 +445,6 @@ public class AudioProcessorImpl
 
 	private Set<String> _audioMimeTypes = SetUtil.fromArray(
 		PropsValues.DL_FILE_ENTRY_PREVIEW_AUDIO_MIME_TYPES);
-	private List<Long> _fileVersionIds = new Vector<Long>();
 
 	private static class LiferayAudioProcessCallable
 		implements ProcessCallable<String> {
