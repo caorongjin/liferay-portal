@@ -51,11 +51,9 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.InputStream;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -64,6 +62,7 @@ import org.apache.commons.lang.time.StopWatch;
  * @author Juan González
  * @author Sergio González
  * @author Mika Koivisto
+ * @author Ivica Cardic
  */
 public class VideoProcessorImpl
 	extends DLPreviewableProcessor implements VideoProcessor {
@@ -150,6 +149,8 @@ public class VideoProcessorImpl
 
 	public void trigger(
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
+
+		super.trigger(sourceFileVersion, destinationFileVersion);
 
 		_instance._queueGeneration(sourceFileVersion, destinationFileVersion);
 	}
@@ -329,6 +330,11 @@ public class VideoProcessorImpl
 					Future<String> future = ProcessExecutor.execute(
 						ClassPathUtil.getPortalClassPath(), processCallable);
 
+					String processIdentity = Long.toString(
+						fileVersion.getFileVersionId());
+
+					managedProcesses.put(processIdentity, future);
+
 					future.get();
 				}
 				else {
@@ -450,7 +456,7 @@ public class VideoProcessorImpl
 		finally {
 			StreamUtil.cleanUp(inputStream);
 
-			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
+			fileVersionIds.remove(destinationFileVersion.getFileVersionId());
 
 			for (int i = 0; i < previewTempFiles.length; i++) {
 				FileUtil.delete(previewTempFiles[i]);
@@ -491,6 +497,11 @@ public class VideoProcessorImpl
 
 			Future<String> future = ProcessExecutor.execute(
 				ClassPathUtil.getPortalClassPath(), processCallable);
+
+			String processIdentity = Long.toString(
+				fileVersion.getFileVersionId());
+
+			managedProcesses.put(processIdentity, future);
 
 			future.get();
 		}
@@ -543,14 +554,14 @@ public class VideoProcessorImpl
 	private void _queueGeneration(
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
 
-		if (_fileVersionIds.contains(
+		if (fileVersionIds.contains(
 				destinationFileVersion.getFileVersionId()) ||
 			!isSupported(destinationFileVersion)) {
 
 			return;
 		}
 
-		_fileVersionIds.add(destinationFileVersion.getFileVersionId());
+		fileVersionIds.add(destinationFileVersion.getFileVersionId());
 
 		sendGenerationMessage(
 			DestinationNames.DOCUMENT_LIBRARY_VIDEO_PROCESSOR,
@@ -569,7 +580,6 @@ public class VideoProcessorImpl
 		InstancePool.put(VideoProcessorImpl.class.getName(), _instance);
 	}
 
-	private List<Long> _fileVersionIds = new Vector<Long>();
 	private Set<String> _videoMimeTypes = SetUtil.fromArray(
 		PropsValues.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES);
 

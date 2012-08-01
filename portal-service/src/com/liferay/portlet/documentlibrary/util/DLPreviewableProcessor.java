@@ -47,8 +47,15 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+
 /**
  * @author Alexander Chow
+ * @author Ivica Cardic
  */
 public abstract class DLPreviewableProcessor extends BaseDLProcessorImpl {
 
@@ -153,6 +160,21 @@ public abstract class DLPreviewableProcessor extends BaseDLProcessorImpl {
 		}
 
 		return isSupported(fileVersion.getMimeType());
+	}
+
+	public void trigger(
+		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
+
+		if (fileVersionIds.contains(
+			destinationFileVersion.getFileVersionId())) {
+
+			String processIdentity = Long.toString(
+				destinationFileVersion.getFileVersionId());
+
+			destroyProcess(processIdentity);
+
+			fileVersionIds.remove(destinationFileVersion.getFileVersionId());
+		}
 	}
 
 	protected static void deleteFiles(
@@ -336,6 +358,18 @@ public abstract class DLPreviewableProcessor extends BaseDLProcessorImpl {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
+		}
+	}
+
+	protected void destroyProcess(String processIdentity) {
+		synchronized (DLPreviewableProcessor.class) {
+			Future future = managedProcesses.get(processIdentity);
+
+			if (future != null) {
+				future.cancel(true);
+
+				managedProcesses.remove(processIdentity);
+			}
 		}
 	}
 
@@ -1200,6 +1234,11 @@ public abstract class DLPreviewableProcessor extends BaseDLProcessorImpl {
 			FileUtil.delete(file);
 		}
 	}
+
+	protected List<Long> fileVersionIds = new Vector<Long>();
+
+	protected Map<String, Future> managedProcesses =
+		new ConcurrentHashMap<String, Future>();
 
 	private static Log _log = LogFactoryUtil.getLog(
 		DLPreviewableProcessor.class);
