@@ -142,6 +142,8 @@ public class ActionKeys {
 
 	public static final String BAN_USER = "BAN_USER";
 
+	public static final String CANCEL_CHECKOUT = "CANCEL_CHECKOUT";
+
 	public static final String CONFIGURATION = "CONFIGURATION";
 
 	public static final String CONFIGURE_PORTLETS = "CONFIGURE_PORTLETS";

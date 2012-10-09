@@ -889,7 +889,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 				);
 			</c:if>
 
-			<c:if test="<%= fileEntry.isCheckedOut() && fileEntry.hasLock() %>">
+			<c:if test="<%= fileEntry.isCheckedOut() && (fileEntry.hasLock() || LPermission.contains(permissionChecker, scopeGroupId, ActionKeys.CANCEL_CHECKOUT)) %>">
 				fileEntryToolbarChildren.push(
 					{
 

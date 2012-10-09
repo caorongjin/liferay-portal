@@ -144,6 +144,8 @@ public abstract class CMISModel {
 		_mappedActionKeys.put(ActionKeys.ADD_FOLDER, Action.CAN_CREATE_FOLDER);
 		_mappedActionKeys.put(
 			ActionKeys.ADD_SUBFOLDER, Action.CAN_CREATE_FOLDER);
+		_mappedActionKeys.put(
+			ActionKeys.CANCEL_CHECKOUT, Action.CAN_CANCEL_CHECK_OUT);
 		_mappedActionKeys.put(ActionKeys.DELETE, Action.CAN_DELETE_OBJECT);
 		_mappedActionKeys.put(ActionKeys.UPDATE, Action.CAN_UPDATE_PROPERTIES);
 		_mappedActionKeys.put(ActionKeys.VIEW, Action.CAN_GET_PROPERTIES);
