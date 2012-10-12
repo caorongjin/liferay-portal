@@ -71,6 +71,17 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 	public DLFileVersion cancelCheckOut(long fileEntryId)
 		throws PortalException, SystemException {
 
+		boolean override = false;
+
+		try {
+			DLFileEntryPermission.check(
+				getPermissionChecker(), fileEntryId, ActionKeys.CANCEL_CHECKOUT);
+
+			override = true;
+		}
+		catch (NoSuchFileEntryException nsfee) {
+		}
+
 		try {
 			DLFileEntryPermission.check(
 				getPermissionChecker(), fileEntryId, ActionKeys.UPDATE);
@@ -78,7 +89,8 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		catch (NoSuchFileEntryException nsfee) {
 		}
 
-		return dlFileEntryLocalService.cancelCheckOut(getUserId(), fileEntryId);
+		return dlFileEntryLocalService.cancelCheckOut(
+			getUserId(), fileEntryId, override);
 	}
 
 	public void checkInFileEntry(
@@ -552,6 +564,7 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 
 		return dlFileEntryLocalService.moveFileEntry(
 			getUserId(), fileEntryId, newFolderId, serviceContext);
+
 	}
 
 	public Lock refreshFileEntryLock(

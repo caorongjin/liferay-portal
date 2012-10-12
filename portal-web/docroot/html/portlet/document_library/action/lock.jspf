@@ -31,7 +31,7 @@
 			/>
 		</c:when>
 		<c:otherwise>
-			<c:if test="<%= fileEntry.hasLock() || permissionChecker.isGroupAdmin(fileEntry.getRepositoryId()) %>">
+			<c:if test="<%= fileEntry.hasLock() || LPermission.contains(permissionChecker, scopeGroupId, ActionKeys.CANCEL_CHECKOUT) %>">
 				<portlet:actionURL var="checkInURL">
 					<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
 					<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.CHECKIN %>" />
