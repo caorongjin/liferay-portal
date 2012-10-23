@@ -338,9 +338,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 	public void deleteAll(long repositoryId)
 		throws PortalException, SystemException {
 
-		LocalRepository localRepository = getLocalRepository(repositoryId);
-
-		localRepository.deleteAll();
+		repositoryLocalService.deleteRepository(repositoryId);
 	}
 
 	/**
