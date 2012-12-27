@@ -2063,7 +2063,13 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		if (newFolderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			FileEntry fileEntry = fromRepository.getFileEntry(fileEntryId);
 
-			toRepository = getRepository(fileEntry.getGroupId());
+			long scopeGroupId = fileEntry.getGroupId();
+
+			toRepository = getRepository(scopeGroupId);
+
+			if (serviceContext.getScopeGroupId() == 0) {
+				serviceContext.setScopeGroupId(scopeGroupId);
+			}
 		}
 		else {
 			toRepository = getRepository(newFolderId, 0, 0);
