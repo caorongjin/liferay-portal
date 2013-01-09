@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Lock;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
@@ -72,13 +73,16 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		try {
-			DLFileEntryPermission.check(
-				getPermissionChecker(), fileEntryId, ActionKeys.UPDATE);
+			if (hasFileEntryLock(fileEntryId)) {
+				return dlFileEntryLocalService.cancelCheckOut(
+					getUserId(), fileEntryId);
+			}
+			else {
+				throw new PrincipalException();
+			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
 		}
-
-		return dlFileEntryLocalService.cancelCheckOut(getUserId(), fileEntryId);
 	}
 
 	public void checkInFileEntry(
@@ -87,14 +91,16 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		try {
-			DLFileEntryPermission.check(
-				getPermissionChecker(), fileEntryId, ActionKeys.UPDATE);
+			if (hasFileEntryLock(fileEntryId)) {
+				dlFileEntryLocalService.checkInFileEntry(
+					getUserId(), fileEntryId, major, changeLog, serviceContext);
+			}
+			else {
+				throw new PrincipalException();
+			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
 		}
-
-		dlFileEntryLocalService.checkInFileEntry(
-			getUserId(), fileEntryId, major, changeLog, serviceContext);
 	}
 
 	/**
@@ -111,14 +117,16 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		try {
-			DLFileEntryPermission.check(
-				getPermissionChecker(), fileEntryId, ActionKeys.UPDATE);
+			if (hasFileEntryLock(fileEntryId)) {
+				dlFileEntryLocalService.checkInFileEntry(
+					getUserId(), fileEntryId, lockUuid, serviceContext);
+			}
+			else {
+				throw new PrincipalException();
+			}
 		}
 		catch (NoSuchFileEntryException nsfee) {
 		}
-
-		dlFileEntryLocalService.checkInFileEntry(
-			getUserId(), fileEntryId, lockUuid, serviceContext);
 	}
 
 	/**
@@ -520,6 +528,13 @@ public class DLFileEntryServiceImpl extends DLFileEntryServiceBaseImpl {
 			(folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
 
 			hasLock = dlFolderService.hasInheritableLock(folderId);
+		}
+
+		if (DLFileEntryPermission.contains(
+				getPermissionChecker(), fileEntryId,
+				ActionKeys.OVERRIDE_CHECKOUT)) {
+
+			hasLock = true;
 		}
 
 		return hasLock;
