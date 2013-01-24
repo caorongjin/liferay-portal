@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -152,6 +153,8 @@ public interface DL {
 
 	public OrderByComparator getRepositoryModelOrderByComparator(
 		String orderByCol, String orderByType);
+
+	public List<SearchResult> getSearchResults(Hits hits);
 
 	public String getTempFileId(long id, String version);
 
