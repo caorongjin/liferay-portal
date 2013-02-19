@@ -261,11 +261,12 @@ public class AudioProcessorImpl
 			return;
 		}
 
-		for (String previewType : _PREVIEW_TYPES) {
+		for (int i=0; i < _PREVIEW_TYPES.length; i++) {
+			String previewType = _PREVIEW_TYPES[i];
 			if (previewType.equals("mp3") || previewType.equals("ogg")) {
 				importPreview(
 					portletDataContext, fileEntry, importedFileEntry,
-					fileEntryElement, "audio", previewType);
+					fileEntryElement, "audio", previewType, i);
 			}
 		}
 	}
