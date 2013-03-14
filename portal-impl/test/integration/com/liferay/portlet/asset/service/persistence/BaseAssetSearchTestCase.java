@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.service.ServiceContext;
@@ -514,19 +515,17 @@ public abstract class BaseAssetSearchTestCase {
 	public void testClassTypeIds1() throws Exception {
 		AssetEntryQuery assetEntryQuery =
 			AssetEntryQueryTestUtil.createAssetEntryQuery(
-				_group.getGroupId(), new String[] {getBaseModelClassName()},
-				getClassTypeIds());
+				_group.getGroupId(), new String[] {getBaseModelClassName()});
 
-		testClassTypeIds(assetEntryQuery, 1);
+		testClassTypeIds(assetEntryQuery, true);
 	}
 
 	public void testClassTypeIds2() throws Exception {
 		AssetEntryQuery assetEntryQuery =
 			AssetEntryQueryTestUtil.createAssetEntryQuery(
-				_group.getGroupId(), new String[] {getBaseModelClassName()},
-				new long[0]);
+				_group.getGroupId(), new String[] {getBaseModelClassName()});
 
-		testClassTypeIds(assetEntryQuery, 0);
+		testClassTypeIds(assetEntryQuery, false);
 	}
 
 	@Test
@@ -906,7 +905,7 @@ public abstract class BaseAssetSearchTestCase {
 	}
 
 	protected void testClassTypeIds(
-			AssetEntryQuery assetEntryQuery, int expectedResults)
+			AssetEntryQuery assetEntryQuery, boolean classType)
 		throws Exception {
 
 		ServiceContext serviceContext = ServiceTestUtil.getServiceContext();
@@ -925,11 +924,19 @@ public abstract class BaseAssetSearchTestCase {
 		addBaseModelWithClassType(
 			parentBaseModel, getSearchKeywords(), serviceContext);
 
-		searchContext.setClassTypeIds(getClassTypeIds());
+		if (classType) {
+			assetEntryQuery.setClassTypeIds(getClassTypeIds());
 
-		Assert.assertEquals(
-			initialEntries + expectedResults,
-			searchCount(assetEntryQuery, searchContext));
+			Assert.assertEquals(
+				initialEntries + 1,
+				searchCount(assetEntryQuery, searchContext));
+		}
+		else {
+			assetEntryQuery.setClassTypeIds(new long[] {0});
+
+			Assert.assertEquals(
+				initialEntries, searchCount(assetEntryQuery, searchContext));
+		}
 	}
 
 	protected void testOrderByTitle(
@@ -952,7 +959,9 @@ public abstract class BaseAssetSearchTestCase {
 			addBaseModel(parentBaseModel, title, serviceContext);
 		}
 
-		assetEntryQuery.setOrderByCol1("title");
+		assetEntryQuery.setOrderByCol1(
+			"localized_title_".concat(
+				LocaleUtil.toLanguageId(LocaleUtil.getDefault())));
 		assetEntryQuery.setOrderByType1(orderByType);
 
 		Document[] documents = search(assetEntryQuery, searchContext);

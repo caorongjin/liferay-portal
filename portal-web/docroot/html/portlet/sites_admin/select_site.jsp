@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -128,7 +128,7 @@ if (selUser != null) {
 			<%
 			String rowHREF = null;
 
-			if (Validator.isNull(p_u_i_d) || SiteMembershipPolicyUtil.isMembershipAllowed(selUser != null ? selUser.getUserId() : 0, group.getOrganizationId())) {
+			if (Validator.isNull(p_u_i_d) || SiteMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, group.getGroupId())) {
 				StringBundler sb = new StringBundler(10);
 
 				sb.append("javascript:opener.");

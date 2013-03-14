@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -78,7 +78,7 @@ portletURL.setParameter("callback", callback);
 			<%
 			String rowHREF = null;
 
-			if (UserGroupMembershipPolicyUtil.isMembershipAllowed(selUser != null ? selUser.getUserId() : 0, userGroup.getUserGroupId())) {
+			if (UserGroupMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, userGroup.getUserGroupId())) {
 				StringBundler sb = new StringBundler(10);
 
 				sb.append("javascript:opener.");

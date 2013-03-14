@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.servlet.taglib.FileAvailabilityUtil;
 import com.liferay.portal.kernel.util.AutoResetThreadLocal;
 import com.liferay.portal.kernel.util.JavaDetector;
 import com.liferay.portal.security.lang.PortalSecurityManager;
-import com.liferay.portal.security.pacl.checker.CheckerUtil;
 import com.liferay.portal.security.pacl.jndi.PACLInitialContextFactoryBuilder;
 
 import java.lang.reflect.Field;
@@ -219,10 +218,6 @@ public class PortalSecurityManagerImpl extends SecurityManager
 
 		_log.debug("Loading " + FileAvailabilityUtil.class.getName());
 		_log.debug("Loading " + PortalHookPermission.class.getName());
-
-		// Touch dependent classes to prevent NoClassDefError
-
-		CheckerUtil.isAccessControllerDoPrivileged(0);
 	}
 
 	protected void initInitialContextFactoryBuilder() throws Exception {

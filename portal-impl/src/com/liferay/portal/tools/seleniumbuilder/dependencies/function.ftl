@@ -23,12 +23,16 @@ public class ${seleniumBuilderContext.getFunctionSimpleClassName(functionName)} 
 			</#if>
 		</#list>
 
-		) {
-			<#assign childElementNames = seleniumBuilderFileUtil.getChildElementNames(functionCommandElement)>
+		) throws Exception {
+			<#assign childElementAttributeValues = seleniumBuilderFileUtil.getChildElementAttributeValues(functionCommandElement, "function")>
 
-			<#list childElementNames as childElementName>
-				${childElementName}Function ${seleniumBuilderFileUtil.getVariableName(childElementName)}Function = new ${childElementName}Function(liferaySelenium);
+			<#list childElementAttributeValues as childElementAttributeValue>
+				${childElementAttributeValue}Function ${seleniumBuilderFileUtil.getVariableName(childElementAttributeValue)}Function = new ${childElementAttributeValue}Function(liferaySelenium);
 			</#list>
+
+			<#assign blockElement = functionCommandElement>
+
+			<#include "block_element.ftl">
 		}
 	</#list>
 

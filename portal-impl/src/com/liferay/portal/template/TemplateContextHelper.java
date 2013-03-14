@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,9 +23,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletModeFactory_IW;
 import com.liferay.portal.kernel.portlet.WindowStateFactory_IW;
+import com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandler;
+import com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateContextType;
+import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.util.ArrayUtil_IW;
 import com.liferay.portal.kernel.util.DateUtil_IW;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
@@ -102,6 +105,29 @@ import org.apache.struts.tiles.ComponentContext;
  * @author Tina Tian
  */
 public class TemplateContextHelper {
+
+	public static Map<String, TemplateVariableGroup> getTemplateVariableGroups(
+		long classNameId, long classPK) {
+
+		PortletDisplayTemplateHandler portletDisplayTemplateHandler =
+			PortletDisplayTemplateHandlerRegistryUtil.
+				getPortletDisplayTemplateHandler(classNameId);
+
+		if (portletDisplayTemplateHandler == null) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, TemplateVariableGroup> templateVariableGroups =
+			portletDisplayTemplateHandler.getTemplateVariableGroups(classPK);
+
+		TemplateVariableGroup utilTemplateVariableGroup =
+			templateVariableGroups.get("util");
+
+		utilTemplateVariableGroup.addVariable(
+			"http-request", HttpServletRequest.class, "request");
+
+		return templateVariableGroups;
+	}
 
 	public Map<String, Object> getHelperUtilities(
 		TemplateContextType templateContextType) {

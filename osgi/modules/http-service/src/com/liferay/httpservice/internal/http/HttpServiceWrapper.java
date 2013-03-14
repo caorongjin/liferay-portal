@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -58,10 +58,16 @@ public class HttpServiceWrapper implements ExtendedHttpService, HttpService {
 	public void registerListener(
 		Object listener, Map<String, String> initParameters,
 		HttpContext httpContext) {
+
+		bundleServletContext.registerListener(
+			listener, initParameters, httpContext);
 	}
 
 	public void registerResources(
-		String alias, String name, HttpContext httpContext) {
+			String alias, String name, HttpContext httpContext)
+		throws NamespaceException {
+
+		bundleServletContext.registerResources(alias, name, httpContext);
 	}
 
 	public void registerServlet(
@@ -97,6 +103,7 @@ public class HttpServiceWrapper implements ExtendedHttpService, HttpService {
 	}
 
 	public void unregisterListener(Object listener) {
+		bundleServletContext.unregisterListener(listener);
 	}
 
 	public void unregisterServlet(String servletName) {

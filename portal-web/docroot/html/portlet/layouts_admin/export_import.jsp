@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -87,7 +87,7 @@ portletsList = ListUtil.sort(portletsList, new PortletTitleComparator(applicatio
 <aui:form cssClass="lfr-export-dialog" method="post" name="fm1">
 	<c:choose>
 		<c:when test="<%= cmd.equals(Constants.EXPORT) %>">
-			<%@ include file="/html/portlet/layouts_admin/export_import_options.jspf" %>
+			<%@ include file="/html/portlet/layouts_admin/export_options.jspf" %>
 
 			<aui:button-row>
 				<aui:button type="submit" value="export" />
@@ -162,7 +162,7 @@ portletsList = ListUtil.sort(portletsList, new PortletTitleComparator(applicatio
 
 			<c:choose>
 				<c:when test="<%= (layout.getGroupId() != groupId) || (layout.isPrivateLayout() != privateLayout) %>">
-					<%@ include file="/html/portlet/layouts_admin/export_import_options.jspf" %>
+					<%@ include file="/html/portlet/layouts_admin/import_options.jspf" %>
 
 					<aui:button-row>
 						<aui:button type="submit" value="import" />

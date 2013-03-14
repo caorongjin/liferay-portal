@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -226,24 +226,23 @@ public class SampleSQLBuilder {
 		processTemplate(_tplDLFolders, context);
 	}
 
-	public void insertDLFileEntry(
-			DLFileEntry dlFileEntry, DDMStructure ddmStructure)
+	public void insertDLFileEntry(DLFileEntry dlFileEntry, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFileEntry", dlFileEntry);
 
 		processTemplate(_tplDLFileEntry, context);
 	}
 
-	public void insertDLFolder(DLFolder dlFolder, DDMStructure ddmStructure)
+	public void insertDLFolder(DLFolder dlFolder, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFolder", dlFolder);
 
 		processTemplate(_tplDLFolder, context);
@@ -251,12 +250,12 @@ public class SampleSQLBuilder {
 
 	public void insertDLFolders(
 			long groupId, long parentDLFolderId, int dlFolderDepth,
-			DDMStructure ddmStructure)
+			long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFolderDepth", dlFolderDepth);
 		put(context, "groupId", groupId);
 		put(context, "parentDLFolderId", parentDLFolderId);

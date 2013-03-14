@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@
 <%@ include file="/html/portlet/roles_admin/init.jsp" %>
 
 <%
+String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 String callback = ParamUtil.getString(request, "callback", "selectRole");
 
 User selUser = PortalUtil.getSelectedUser(request);
@@ -82,7 +83,7 @@ portletURL.setParameter("callback", callback);
 			<%
 			String rowHREF = null;
 
-			if (RoleMembershipPolicyUtil.isRoleAllowed(selUser != null ? selUser.getUserId() : 0, role.getRoleId())) {
+			if (Validator.isNull(p_u_i_d)|| RoleMembershipPolicyUtil.isRoleAllowed((selUser != null) ? selUser.getUserId() : 0, role.getRoleId())) {
 				StringBundler sb = new StringBundler(8);
 
 				sb.append("javascript:opener.");

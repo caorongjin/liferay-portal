@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -105,12 +105,7 @@ public class WikiActivityInterpreter extends BaseSocialActivityInterpreter {
 	}
 
 	@Override
-	protected String getPath(SocialActivity activity) throws Exception {
-		return "/wiki/find_page?pageResourcePrimKey=";
-	}
-
-	@Override
-	protected String getTitle(
+	protected String getEntryTitle(
 			SocialActivity activity, ThemeDisplay themeDisplay)
 		throws Exception {
 
@@ -126,6 +121,11 @@ public class WikiActivityInterpreter extends BaseSocialActivityInterpreter {
 		}
 
 		return page.getTitle();
+	}
+
+	@Override
+	protected String getPath(SocialActivity activity) throws Exception {
+		return "/wiki/find_page?pageResourcePrimKey=";
 	}
 
 	@Override

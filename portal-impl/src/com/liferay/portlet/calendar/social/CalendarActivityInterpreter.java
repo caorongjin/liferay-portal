@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,6 +37,17 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 	}
 
 	@Override
+	protected String getEntryTitle(
+			SocialActivity activity, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		CalEvent event = CalEventLocalServiceUtil.getEvent(
+			activity.getClassPK());
+
+		return getValue(activity.getExtraData(), "title", event.getTitle());
+	}
+
+	@Override
 	protected String getLink(SocialActivity activity, ThemeDisplay themeDisplay)
 		throws Exception {
 
@@ -50,17 +61,6 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 		sb.append(activity.getClassPK());
 
 		return sb.toString();
-	}
-
-	@Override
-	protected String getTitle(
-			SocialActivity activity, ThemeDisplay themeDisplay)
-		throws Exception {
-
-		CalEvent event = CalEventLocalServiceUtil.getEvent(
-			activity.getClassPK());
-
-		return getValue(activity.getExtraData(), "title", event.getTitle());
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,30 +43,35 @@ public class SeleniumBuilderFileUtil {
 		return _baseDir;
 	}
 
-	public Set<String> getChildElementNames(Element element) {
-		Set<String> childElementNames = new TreeSet<String>();
+	public Set<String> getChildElementAttributeValues(
+		Element element, String attributeName) {
+
+		Set<String> childElementAttributeValues = new TreeSet<String>();
 
 		List<Element> childElements = element.elements();
 
 		if (childElements.isEmpty()) {
-			return childElementNames;
+			return childElementAttributeValues;
 		}
 
 		for (Element childElement : childElements) {
-			String childElementName = childElement.attributeValue("name");
+			String childElementName = childElement.attributeValue(
+				attributeName);
 
 			if (childElementName != null) {
 				int x = childElementName.lastIndexOf(StringPool.POUND);
 
 				if (x != -1) {
-					childElementNames.add(childElementName.substring(0, x));
+					childElementAttributeValues.add(
+						childElementName.substring(0, x));
 				}
 			}
 
-			childElementNames.addAll(getChildElementNames(childElement));
+			childElementAttributeValues.addAll(
+				getChildElementAttributeValues(childElement, attributeName));
 		}
 
-		return childElementNames;
+		return childElementAttributeValues;
 	}
 
 	public String getClassName(String fileName) {
@@ -84,7 +89,17 @@ public class SeleniumBuilderFileUtil {
 	public String getClassSuffix(String fileName) {
 		int x = fileName.indexOf(CharPool.PERIOD);
 
-		return StringUtil.upperCaseFirstLetter(fileName.substring(x + 1));
+		String classSuffix = StringUtil.upperCaseFirstLetter(
+			fileName.substring(x + 1));
+
+		if (classSuffix.equals("Testcase")) {
+			classSuffix = "TestCase";
+		}
+		else if (classSuffix.equals("Testsuite")) {
+			classSuffix = "TestSuite";
+		}
+
+		return classSuffix;
 	}
 
 	public String getJavaFileName(String fileName) {
@@ -166,11 +181,13 @@ public class SeleniumBuilderFileUtil {
 	public int getTargetCount(Element rootElement) {
 		String xml = rootElement.asXML();
 
-		for (int i = 1;;) {
+		for (int i = 1;; i++) {
 			if (xml.contains("${target" + i + "}")) {
-				i++;
-
 				continue;
+			}
+
+			if (i > 1) {
+				i--;
 			}
 
 			return i;
@@ -238,13 +255,6 @@ public class SeleniumBuilderFileUtil {
 
 			if ((tdText == null) || !shortFileName.equals(tdText)) {
 				System.out.println(fileName + " has an invalid <td>");
-			}
-		}
-		else {
-			String name = rootElement.attributeValue("name");
-
-			if ((name == null) || !name.equals(shortFileName)) {
-				System.out.println(fileName + " has an invalid name=\"\"");
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -83,35 +83,8 @@ public class DLActivityInterpreter extends BaseSocialActivityInterpreter {
 		return sb.toString();
 	}
 
-	protected String getFolderLink(
-		FileEntry fileEntry, ThemeDisplay themeDisplay) {
-
-		StringBundler sb = new StringBundler(6);
-
-		sb.append(themeDisplay.getPortalURL());
-		sb.append(themeDisplay.getPathMain());
-		sb.append("/document_library/find_folder?groupId=");
-		sb.append(fileEntry.getRepositoryId());
-		sb.append("&folderId=");
-		sb.append(fileEntry.getFolderId());
-
-		return sb.toString();
-	}
-
 	@Override
-	protected String getPath(SocialActivity activity) throws Exception {
-		if (activity.isClassName(DLFileEntry.class.getName())) {
-			return "/document_library/find_file_entry?fileEntryId=";
-		}
-		else if (activity.isClassName(DLFolder.class.getName())) {
-			return "/document_library/find_folder?folderId=";
-		}
-
-		return StringPool.BLANK;
-	}
-
-	@Override
-	protected String getTitle(
+	protected String getEntryTitle(
 			SocialActivity activity, ThemeDisplay themeDisplay)
 		throws Exception {
 
@@ -144,6 +117,33 @@ public class DLActivityInterpreter extends BaseSocialActivityInterpreter {
 			}
 
 			return folder.getName();
+		}
+
+		return StringPool.BLANK;
+	}
+
+	protected String getFolderLink(
+		FileEntry fileEntry, ThemeDisplay themeDisplay) {
+
+		StringBundler sb = new StringBundler(6);
+
+		sb.append(themeDisplay.getPortalURL());
+		sb.append(themeDisplay.getPathMain());
+		sb.append("/document_library/find_folder?groupId=");
+		sb.append(fileEntry.getRepositoryId());
+		sb.append("&folderId=");
+		sb.append(fileEntry.getFolderId());
+
+		return sb.toString();
+	}
+
+	@Override
+	protected String getPath(SocialActivity activity) throws Exception {
+		if (activity.isClassName(DLFileEntry.class.getName())) {
+			return "/document_library/find_file_entry?fileEntryId=";
+		}
+		else if (activity.isClassName(DLFolder.class.getName())) {
+			return "/document_library/find_folder?folderId=";
 		}
 
 		return StringPool.BLANK;
