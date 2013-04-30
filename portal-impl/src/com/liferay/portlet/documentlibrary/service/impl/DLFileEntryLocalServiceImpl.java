@@ -655,6 +655,8 @@ public class DLFileEntryLocalServiceImpl
 			dlFileEntryMetadataLocalService.updateFileEntryMetadata(
 				companyId, ddmStructures, fileEntryTypeId, fileEntryId,
 				toFileVersionId, fieldsMap, serviceContext);
+
+			return;
 		}
 
 		ddmStructures = ddmStructureLocalService.getClassStructures(
