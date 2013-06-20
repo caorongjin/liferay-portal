@@ -95,6 +95,12 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		return expandoBridge.getAttributes();
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		DLFileEntry other = (DLFileEntry) obj;
+		return _dlFileEntry.equals(other);		
+	}
+	
 	public FileVersion getCachedFileVersion() {
 		if (_dlFileVersion == null) {
 			return null;
