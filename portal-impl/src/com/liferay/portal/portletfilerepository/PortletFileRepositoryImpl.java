@@ -73,24 +73,9 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 			InputStream inputStream = inputStreamOVP.getValue();
 			String fileName = inputStreamOVP.getKey();
 
-			File file = null;
-
-			try {
-				file = FileUtil.createTempFile(inputStream);
-
-				String mimeType = MimeTypesUtil.getContentType(file, fileName);
-
-				addPortletFileEntry(
-					groupId, userId, className, classPK, portletId, folderId,
-					file, fileName, mimeType);
-			}
-			catch (IOException ioe) {
-				throw new SystemException(
-					"Unable to write temporary file", ioe);
-			}
-			finally {
-				FileUtil.delete(file);
-			}
+			addPortletFileEntry(
+				groupId, userId, className, classPK, portletId, folderId,
+				inputStream, fileName, StringPool.BLANK);
 		}
 	}
 
@@ -142,15 +127,6 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 			return null;
 		}
 
-		byte[] bytes = null;
-
-		try {
-			bytes = FileUtil.getBytes(inputStream, -1, false);
-		}
-		catch (IOException ioe) {
-			return null;
-		}
-
 		ServiceContext serviceContext = new ServiceContext();
 
 		serviceContext.setAddGroupPermissions(true);
@@ -164,15 +140,30 @@ public class PortletFileRepositoryImpl implements PortletFileRepository {
 
 		boolean dlAppHelperEnabled = DLAppHelperThreadLocal.isEnabled();
 
+		File file = null;
+
 		try {
 			DLAppHelperThreadLocal.setEnabled(false);
 
+			file = FileUtil.createTempFile(inputStream);
+
+			if (Validator.isNull(mimeType)) {
+				mimeType = MimeTypesUtil.getContentType(file, fileName);
+			}
+
 			return DLAppLocalServiceUtil.addFileEntry(
 				userId, repository.getRepositoryId(), folderId, fileName,
-				mimeType, fileName, StringPool.BLANK, StringPool.BLANK, bytes,
+				mimeType, fileName, StringPool.BLANK, StringPool.BLANK, file,
 				serviceContext);
 		}
+		catch (IOException ioe) {
+			throw new SystemException(
+				"Unable to write temporary file " + file.getAbsolutePath(),
+				ioe);
+		}
 		finally {
+			FileUtil.delete(file);
+
 			DLAppHelperThreadLocal.setEnabled(dlAppHelperEnabled);
 		}
 	}
