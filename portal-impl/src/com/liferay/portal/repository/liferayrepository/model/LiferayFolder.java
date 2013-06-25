@@ -75,7 +75,7 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		return DLFolderPermission.contains(
 			permissionChecker, _dlFolder, actionId);
 	}
-	
+
 	@Override
 	public List<Long> getAncestorFolderIds()
 		throws PortalException, SystemException {

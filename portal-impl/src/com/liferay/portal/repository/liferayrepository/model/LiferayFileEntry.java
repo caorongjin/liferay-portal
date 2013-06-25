@@ -418,7 +418,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	public void setUuid(String uuid) {
 		_dlFileEntry.setUuid(uuid);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) {
