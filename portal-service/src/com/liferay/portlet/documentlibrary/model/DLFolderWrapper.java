@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.documentlibrary.model;
 
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.ModelWrapper;
 
 import java.util.Date;
@@ -935,6 +936,25 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 		return _dlFolder.compareTo(dlFolder);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof DLFolderWrapper)) {
+			return false;
+		}
+
+		DLFolderWrapper dlFolderWrapper = (DLFolderWrapper) obj;
+
+		if (Validator.equals(_dlFolder, dlFolderWrapper._dlFolder)) {
+			return true;
+		}
+
+		return false;
+	}
+	
 	@Override
 	public int hashCode() {
 		return _dlFolder.hashCode();
