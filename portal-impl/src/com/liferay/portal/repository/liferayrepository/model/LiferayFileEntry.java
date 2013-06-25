@@ -88,14 +88,14 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		return DLFileEntryPermission.contains(
 			permissionChecker, _dlFileEntry, actionId);
 	}
-	
+
 	@Override
 	public Map<String, Serializable> getAttributes() {
 		ExpandoBridge expandoBridge = getExpandoBridge();
 
 		return expandoBridge.getAttributes();
 	}
-	
+
 	public FileVersion getCachedFileVersion() {
 		if (_dlFileVersion == null) {
 			return null;
