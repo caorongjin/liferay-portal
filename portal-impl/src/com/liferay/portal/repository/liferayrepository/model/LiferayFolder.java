@@ -74,12 +74,6 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		return DLFolderPermission.contains(
 			permissionChecker, _dlFolder, actionId);
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		DLFolder other = (DLFolder) obj;
-		return _dlFolder.equals(other);		
-	}
 	
 	@Override
 	public List<Long> getAncestorFolderIds()
@@ -361,6 +355,12 @@ public class LiferayFolder extends LiferayModel implements Folder {
 		_dlFolder.setUuid(uuid);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		DLFolder other = (DLFolder) obj;
+		return _dlFolder.equals(other);		
+	}
+	
 	@Override
 	public Folder toEscapedModel() {
 		if (isEscapedModel()) {

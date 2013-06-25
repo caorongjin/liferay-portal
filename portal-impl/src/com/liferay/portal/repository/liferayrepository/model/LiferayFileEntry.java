@@ -87,12 +87,6 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		return DLFileEntryPermission.contains(
 			permissionChecker, _dlFileEntry, actionId);
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		DLFileEntry other = (DLFileEntry) obj;
-		return _dlFileEntry.equals(other);		
-	}
 	
 	@Override
 	public Map<String, Serializable> getAttributes() {
@@ -422,6 +416,12 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	@Override
 	public void setUuid(String uuid) {
 		_dlFileEntry.setUuid(uuid);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		DLFileEntry other = (DLFileEntry) obj;
+		return _dlFileEntry.equals(other);		
 	}
 
 	@Override
