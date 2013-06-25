@@ -14,12 +14,19 @@
 
 package com.liferay.portal.repository.liferayrepository.model;
 
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
@@ -27,13 +34,6 @@ import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.expando.model.ExpandoBridge;
-
-import java.io.InputStream;
-import java.io.Serializable;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Alexander Chow
@@ -420,8 +420,21 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	
 	@Override
 	public boolean equals(Object obj) {
-		LiferayFileEntry other = (LiferayFileEntry) obj;
-		return _dlFileEntry.equals(other.getModel());		
+	    if (this == obj) {
+	      return true;
+	    }
+	
+	    if (!(obj instanceof LiferayFileEntry)) {
+	      return false;
+	    }
+	
+	    LiferayFileEntry liferayFileEntry = (LiferayFileEntry)obj;
+	
+	    if (Validator.equals(_dlFileEntry, liferayFileEntry._dlFileEntry)) {
+	      return true;
+	    }
+	
+	    return false;
 	}
 
 	@Override
