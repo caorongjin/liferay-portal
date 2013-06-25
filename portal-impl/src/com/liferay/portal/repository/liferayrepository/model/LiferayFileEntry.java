@@ -420,8 +420,8 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	
 	@Override
 	public boolean equals(Object obj) {
-		DLFileEntry other = (DLFileEntry) obj;
-		return _dlFileEntry.equals(other);		
+		LiferayFileEntry other = (LiferayFileEntry) obj;
+		return _dlFileEntry.equals(other.getModel());		
 	}
 
 	@Override

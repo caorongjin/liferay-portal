@@ -357,8 +357,8 @@ public class LiferayFolder extends LiferayModel implements Folder {
 
 	@Override
 	public boolean equals(Object obj) {
-		DLFolder other = (DLFolder) obj;
-		return _dlFolder.equals(other);		
+		LiferayFolder other = (LiferayFolder) obj;
+		return _dlFolder.equals(other.getModel());		
 	}
 	
 	@Override
