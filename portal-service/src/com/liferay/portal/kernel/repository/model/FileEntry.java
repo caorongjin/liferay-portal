@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 
 import java.io.InputStream;
 
@@ -94,7 +95,7 @@ public interface FileEntry extends RepositoryModel<FileEntry> {
 	public List<FileVersion> getFileVersions(int status)
 		throws SystemException;
 
-	public Folder getFolder();
+	public Folder getFolder() throws NoSuchFolderException;
 
 	public long getFolderId();
 

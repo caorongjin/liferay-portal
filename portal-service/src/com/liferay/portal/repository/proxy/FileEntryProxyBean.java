@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.InputStream;
@@ -154,7 +155,7 @@ public class FileEntryProxyBean
 	}
 
 	@Override
-	public Folder getFolder() {
+	public Folder getFolder() throws NoSuchFolderException {
 		Folder folder = _fileEntry.getFolder();
 
 		return newFolderProxyBean(folder);

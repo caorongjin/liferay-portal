@@ -187,7 +187,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	}
 
 	@Override
-	public DLFolder getFolder() {
+	public DLFolder getFolder() throws NoSuchFolderException {
 		DLFolder dlFolder = new DLFolderImpl();
 
 		if (getFolderId() <= 0) {
@@ -198,16 +198,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 			dlFolder = DLFolderLocalServiceUtil.getFolder(getFolderId());
 		}
 		catch (NoSuchFolderException nsfe) {
-			try {
-				DLFileVersion dlFileVersion = getLatestFileVersion(true);
-
-				if (!dlFileVersion.isInTrash()) {
-					_log.error(nsfe, nsfe);
-				}
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
+			throw nsfe;
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -269,7 +260,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	}
 
 	@Override
-	public DLFolder getTrashContainer() {
+	public DLFolder getTrashContainer() throws NoSuchFolderException {
 		DLFolder dlFolder = getFolder();
 
 		if (dlFolder.isInTrash()) {
@@ -324,10 +315,15 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 	@Override
 	public boolean isInTrashContainer() {
-		if (getTrashContainer() != null) {
-			return true;
+		try {
+			if (getTrashContainer() != null) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
+		catch (NoSuchFolderException e) {
 			return false;
 		}
 	}
