@@ -1095,7 +1095,8 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	}
 
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder() {
+	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder()
+		throws com.liferay.portlet.documentlibrary.NoSuchFolderException {
 		return _dlFileEntry.getFolder();
 	}
 
@@ -1123,7 +1124,8 @@ public class DLFileEntryWrapper implements DLFileEntry,
 	}
 
 	@Override
-	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer() {
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer()
+		throws com.liferay.portlet.documentlibrary.NoSuchFolderException {
 		return _dlFileEntry.getTrashContainer();
 	}
 

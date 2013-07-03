@@ -63,7 +63,8 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 	public int getFileVersionsCount(int status)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
-	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder();
+	public com.liferay.portlet.documentlibrary.model.DLFolder getFolder()
+		throws com.liferay.portlet.documentlibrary.NoSuchFolderException;
 
 	public java.lang.String getIcon();
 
@@ -76,7 +77,8 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 
 	public java.lang.String getLuceneProperties();
 
-	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer();
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer()
+		throws com.liferay.portlet.documentlibrary.NoSuchFolderException;
 
 	public boolean hasLock();
 

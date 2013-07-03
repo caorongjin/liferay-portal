@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.model.ModelWrapper;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.InputStream;
@@ -141,7 +142,7 @@ public class FileEntryWrapper implements FileEntry, ModelWrapper<FileEntry> {
 	}
 
 	@Override
-	public Folder getFolder() {
+	public Folder getFolder() throws NoSuchFolderException {
 		return _fileEntry.getFolder();
 	}
 
