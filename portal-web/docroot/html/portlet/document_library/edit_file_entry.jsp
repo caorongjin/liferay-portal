@@ -352,11 +352,13 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 
 							<%
 							for (DLFileEntryType curDLFileEntryType : dlFileEntryTypes) {
+								if ((curDLFileEntryType.getFileEntryTypeId() == 0) || (fileEntryTypeId == curDLFileEntryType.getFileEntryTypeId()) || DLFileEntryTypePermission.contains(permissionChecker, curDLFileEntryType, ActionKeys.VIEW)) {
 							%>
 
 								<aui:option label="<%= HtmlUtil.escape(curDLFileEntryType.getName(locale)) %>" selected="<%= (fileEntryTypeId == curDLFileEntryType.getPrimaryKey()) %>" value="<%= curDLFileEntryType.getPrimaryKey() %>" />
 
 							<%
+								}
 							}
 							%>
 
