@@ -287,22 +287,27 @@ public class PortalImpl implements Portal {
 
 		if (Validator.isNull(_computerName)) {
 			try {
-				_computerName = InetAddress.getLocalHost().getHostName();
+				InetAddress inetAddress = InetAddress.getLocalHost();
+
+				_computerName = inetAddress.getHostName();
 			}
 			catch (UnknownHostException uhe) {
 			}
 		}
 
 		try {
-			_computerAddress = InetAddress.getByName(
-				_computerName).getHostAddress();
+			InetAddress inetAddress = InetAddress.getByName(_computerName);
+
+			_computerAddress = inetAddress.getHostAddress();
 		}
 		catch (UnknownHostException uhe) {
 		}
 
 		if (Validator.isNull(_computerAddress)) {
 			try {
-				_computerAddress = InetAddress.getLocalHost().getHostAddress();
+				InetAddress inetAddress = InetAddress.getLocalHost();
+
+				_computerAddress = inetAddress.getHostAddress();
 			}
 			catch (UnknownHostException uhe) {
 			}
@@ -484,7 +489,6 @@ public class PortalImpl implements Portal {
 		}
 
 		descriptionListMergeable.add(description);
-
 	}
 
 	@Override
@@ -5591,7 +5595,6 @@ public class PortalImpl implements Portal {
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.MESSAGEBOARDS.MODEL." +
 				"MBTHREAD$]",
 			"[$CLASS_NAME_ID_COM.LIFERAY.PORTLET.WIKI.MODEL.WIKIPAGE$]",
-			"[$PORTLET_PREFERENCES_PREFERENCES_DEFAULT$]",
 			"[$RESOURCE_SCOPE_COMPANY$]", "[$RESOURCE_SCOPE_GROUP$]",
 			"[$RESOURCE_SCOPE_GROUP_TEMPLATE$]",
 			"[$RESOURCE_SCOPE_INDIVIDUAL$]",
@@ -5620,9 +5623,8 @@ public class PortalImpl implements Portal {
 			getClassNameId(DLFileEntry.class), getClassNameId(DLFolder.class),
 			getClassNameId(JournalFolder.class),
 			getClassNameId(MBMessage.class), getClassNameId(MBThread.class),
-			getClassNameId(WikiPage.class),
-			PortletConstants.DEFAULT_PREFERENCES,
-			ResourceConstants.SCOPE_COMPANY, ResourceConstants.SCOPE_GROUP,
+			getClassNameId(WikiPage.class), ResourceConstants.SCOPE_COMPANY,
+			ResourceConstants.SCOPE_GROUP,
 			ResourceConstants.SCOPE_GROUP_TEMPLATE,
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			SocialRelationConstants.TYPE_BI_COWORKER,
