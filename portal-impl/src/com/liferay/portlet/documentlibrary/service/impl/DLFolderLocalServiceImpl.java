@@ -822,12 +822,13 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DLFolder updateFolder(
-			long folderId, long parentFolderId, String name, String description,
-			long defaultFileEntryTypeId, List<Long> fileEntryTypeIds,
-			boolean overrideFileEntryTypes, ServiceContext serviceContext)
+			long userId, long folderId, long parentFolderId, String name,
+			String description, long defaultFileEntryTypeId,
+			List<Long> fileEntryTypeIds, boolean overrideFileEntryTypes,
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		boolean hasLock = hasFolderLock(serviceContext.getUserId(), folderId);
+		boolean hasLock = hasFolderLock(userId, folderId);
 
 		Lock lock = null;
 
@@ -836,7 +837,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			// Lock
 
 			lock = lockFolder(
-				serviceContext.getUserId(), folderId, null, false,
+				userId, folderId, null, false,
 				DLFolderImpl.LOCK_EXPIRATION_TIME);
 		}
 
@@ -848,12 +849,12 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 			if (folderId > DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				dlFolder = dlFolderLocalService.updateFolderAndFileEntryTypes(
-					serviceContext.getUserId(), folderId, parentFolderId, name,
-					description, defaultFileEntryTypeId, fileEntryTypeIds,
+					userId, folderId, parentFolderId, name, description,
+					defaultFileEntryTypeId, fileEntryTypeIds,
 					overrideFileEntryTypes, serviceContext);
 
 				dlFileEntryTypeLocalService.cascadeFileEntryTypes(
-					serviceContext.getUserId(), dlFolder);
+					userId, dlFolder);
 			}
 
 			// Workflow definitions
@@ -907,7 +908,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DLFolder updateFolder(
-			long folderId, String name, String description,
+			long userId, long folderId, String name, String description,
 			long defaultFileEntryTypeId, List<Long> fileEntryTypeIds,
 			boolean overrideFileEntryTypes, ServiceContext serviceContext)
 		throws PortalException, SystemException {
