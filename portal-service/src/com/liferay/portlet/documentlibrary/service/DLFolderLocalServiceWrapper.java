@@ -901,30 +901,30 @@ public class DLFolderLocalServiceWrapper implements DLFolderLocalService,
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFolder updateFolder(
-		long folderId, long parentFolderId, java.lang.String name,
+		long userId, long folderId, long parentFolderId, java.lang.String name,
 		java.lang.String description, long defaultFileEntryTypeId,
 		java.util.List<java.lang.Long> fileEntryTypeIds,
 		boolean overrideFileEntryTypes,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _dlFolderLocalService.updateFolder(folderId, parentFolderId,
-			name, description, defaultFileEntryTypeId, fileEntryTypeIds,
-			overrideFileEntryTypes, serviceContext);
+		return _dlFolderLocalService.updateFolder(userId, folderId,
+			parentFolderId, name, description, defaultFileEntryTypeId,
+			fileEntryTypeIds, overrideFileEntryTypes, serviceContext);
 	}
 
 	@Override
 	public com.liferay.portlet.documentlibrary.model.DLFolder updateFolder(
-		long folderId, java.lang.String name, java.lang.String description,
-		long defaultFileEntryTypeId,
+		long userId, long folderId, java.lang.String name,
+		java.lang.String description, long defaultFileEntryTypeId,
 		java.util.List<java.lang.Long> fileEntryTypeIds,
 		boolean overrideFileEntryTypes,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _dlFolderLocalService.updateFolder(folderId, name, description,
-			defaultFileEntryTypeId, fileEntryTypeIds, overrideFileEntryTypes,
-			serviceContext);
+		return _dlFolderLocalService.updateFolder(userId, folderId, name,
+			description, defaultFileEntryTypeId, fileEntryTypeIds,
+			overrideFileEntryTypes, serviceContext);
 	}
 
 	@Override
