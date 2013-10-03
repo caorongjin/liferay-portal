@@ -467,7 +467,7 @@ public class DLFolderServiceImpl extends DLFolderServiceBaseImpl {
 			ActionKeys.UPDATE);
 
 		return dlFolderLocalService.updateFolder(
-			folderId, name, description, defaultFileEntryTypeId,
+			getUserId(), folderId, name, description, defaultFileEntryTypeId,
 			fileEntryTypeIds, overrideFileEntryTypes, serviceContext);
 	}
 
