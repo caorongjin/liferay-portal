@@ -355,12 +355,14 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 	protected void deletePreviews(
 		long companyId, long groupId, long fileEntryId, long fileVersionId) {
 
-		try {
-			DLStoreUtil.deleteDirectory(
-				companyId, REPOSITORY_ID,
-				getPathSegment(groupId, fileEntryId, fileVersionId, true));
-		}
-		catch (Exception e) {
+		for (String type : getPreviewTypes()) {
+			String path = getPreviewFilePath(
+				groupId, fileEntryId, fileVersionId, type);
+			try {
+				DLStoreUtil.deleteFile(companyId, REPOSITORY_ID, path);
+			}
+			catch (Exception e) {
+			}
 		}
 	}
 
@@ -697,6 +699,19 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 	protected String getPreviewFilePath(
 		FileVersion fileVersion, int index, String type) {
 
+		return getPreviewFilePath(
+			fileVersion.getGroupId(), fileVersion.getFileEntryId(),
+			fileVersion.getFileVersionId(), index, type);
+	}
+
+	protected String getPreviewFilePath(FileVersion fileVersion, String type) {
+		return getPreviewFilePath(fileVersion, 0, type);
+	}
+
+	protected String getPreviewFilePath(
+			long groupId, long fileEntryId, long fileVersionId, int index,
+			String type) {
+
 		StringBundler sb = null;
 
 		if (index > 0) {
@@ -706,7 +721,7 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 			sb = new StringBundler(3);
 		}
 
-		sb.append(getPathSegment(fileVersion, true));
+		sb.append(getPathSegment(groupId, fileEntryId, fileVersionId, true));
 
 		if (index > 0) {
 			sb.append(StringPool.SLASH);
@@ -719,8 +734,10 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		return sb.toString();
 	}
 
-	protected String getPreviewFilePath(FileVersion fileVersion, String type) {
-		return getPreviewFilePath(fileVersion, 0, type);
+	protected String getPreviewFilePath(
+		long groupId, long fileEntryId, long fileVersionId, String type) {
+
+		return getPreviewFilePath(groupId, fileEntryId, fileVersionId, 0, type);
 	}
 
 	protected File getPreviewTempFile(String id) {
