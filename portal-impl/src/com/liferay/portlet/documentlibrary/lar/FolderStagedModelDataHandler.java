@@ -38,6 +38,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
+import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
@@ -62,12 +63,10 @@ public class FolderStagedModelDataHandler
 			String uuid, long groupId, String className, String extraData)
 		throws PortalException, SystemException {
 
-		DLFolder dlFolder =
-			DLFolderLocalServiceUtil.fetchDLFolderByUuidAndGroupId(
-				uuid, groupId);
+		Folder folder = FolderUtil.fetchByUUID_R(uuid, groupId);
 
-		if (dlFolder != null) {
-			DLFolderLocalServiceUtil.deleteFolder(dlFolder);
+		if (folder != null) {
+			DLAppHelperLocalServiceUtil.deleteFolder(folder);
 		}
 	}
 
