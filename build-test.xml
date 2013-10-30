@@ -840,7 +840,6 @@
 			</not>
 			<then>
 				<delete dir="${liferay.home}/data" />
-				<delete dir="${liferay.home}/deploy" />
 				<delete dir="${liferay.home}/logs" />
 			</then>
 		</if>
@@ -1029,7 +1028,7 @@
 				<then>
 					<copy todir="${todir}">
 						<fileset
-							dir="${jdbc.drivers.optional.dir}/mysql/5.0.7"
+							dir="lib/development"
 							includes="${jdbc.mysql.driver}"
 						/>
 					</copy>
@@ -2152,6 +2151,8 @@ svn --username ${svn.username} --password ${svn.password} update -r ${svn.info.r
 		<if>
 			<matches pattern="http" string="${test.build.license.xml.zip.url}" />
 			<then>
+				<mkdir dir="${liferay.home}/deploy" />
+
 				<get dest="${liferay.home}/deploy/license.xml" src="${test.build.license.xml.zip.url}" />
 			</then>
 		</if>
@@ -2162,6 +2163,7 @@ svn --username ${svn.username} --password ${svn.password} update -r ${svn.info.r
 				<get dest="plugins.war.zip" src="${test.build.plugins.war.zip.url}" />
 
 				<unzip
+					dest="."
 					src="plugins.war.zip"
 				/>
 
@@ -2493,7 +2495,6 @@ custom.sql.function.isnotnull=CONVERT(VARCHAR,?) IS NOT NULL</echo>
 					</not>
 					<then>
 						<delete dir="${liferay.home}/data" />
-						<delete dir="${liferay.home}/deploy" />
 						<delete dir="${liferay.home}/logs" />
 					</then>
 				</if>
