@@ -282,8 +282,7 @@ public class TrashVersionLocalServiceUtil {
 
 	public static com.liferay.portlet.trash.model.TrashVersion deleteTrashVersion(
 		java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().deleteTrashVersion(className, classPK);
 	}
 
@@ -319,6 +318,7 @@ public class TrashVersionLocalServiceUtil {
 	/**
 	 * @deprecated As of 6.2.0
 	 */
+	@Deprecated
 	public void setService(TrashVersionLocalService service) {
 	}
 

@@ -2355,6 +2355,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	* @deprecated As of 6.2.0, replaced by {@link
 	#getUserByUuidAndCompanyId(String, long)}
 	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.User getUserByUuid(java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -2747,6 +2748,32 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _userLocalService.searchCount(companyId, firstName, middleName,
 			lastName, screenName, emailAddress, status, params, andSearch);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String keywords, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.searchUsers(companyId, keywords, status,
+			params, start, end, sort);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String firstName,
+		java.lang.String middleName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.searchUsers(companyId, firstName, middleName,
+			lastName, screenName, emailAddress, status, params, andSearch,
+			start, end, sort);
 	}
 
 	/**
@@ -3619,6 +3646,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	String, String, long[], long[], long[], java.util.List,
 	long[], boolean, byte[], ServiceContext)}
 	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.User updateUser(long userId,
 		java.lang.String oldPassword, java.lang.String newPassword1,
@@ -3673,6 +3701,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
+	@Deprecated
 	public UserLocalService getWrappedUserLocalService() {
 		return _userLocalService;
 	}
@@ -3680,6 +3709,7 @@ public class UserLocalServiceWrapper implements UserLocalService,
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
+	@Deprecated
 	public void setWrappedUserLocalService(UserLocalService userLocalService) {
 		_userLocalService = userLocalService;
 	}

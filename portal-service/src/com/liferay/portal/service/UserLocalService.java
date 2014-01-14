@@ -1941,6 +1941,7 @@ public interface UserLocalService extends BaseLocalService,
 	* @deprecated As of 6.2.0, replaced by {@link
 	#getUserByUuidAndCompanyId(String, long)}
 	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public com.liferay.portal.model.User getUserByUuid(java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -2297,6 +2298,25 @@ public interface UserLocalService extends BaseLocalService,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
 		boolean andSearch)
 		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String keywords, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String firstName,
+		java.lang.String middleName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Sends an email address verification to the user.
@@ -3031,6 +3051,7 @@ public interface UserLocalService extends BaseLocalService,
 	String, String, long[], long[], long[], java.util.List,
 	long[], boolean, byte[], ServiceContext)}
 	*/
+	@Deprecated
 	public com.liferay.portal.model.User updateUser(long userId,
 		java.lang.String oldPassword, java.lang.String newPassword1,
 		java.lang.String newPassword2, boolean passwordReset,

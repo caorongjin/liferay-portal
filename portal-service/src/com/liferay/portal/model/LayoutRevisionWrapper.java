@@ -1571,6 +1571,7 @@ public class LayoutRevisionWrapper implements LayoutRevision,
 	/**
 	* @deprecated As of 6.1.0, replaced by {@link #isApproved()}
 	*/
+	@Deprecated
 	@Override
 	public boolean getApproved() {
 		return _layoutRevision.getApproved();
@@ -1927,6 +1928,7 @@ public class LayoutRevisionWrapper implements LayoutRevision,
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
 	 */
+	@Deprecated
 	public LayoutRevision getWrappedLayoutRevision() {
 		return _layoutRevision;
 	}
@@ -1934,6 +1936,16 @@ public class LayoutRevisionWrapper implements LayoutRevision,
 	@Override
 	public LayoutRevision getWrappedModel() {
 		return _layoutRevision;
+	}
+
+	@Override
+	public boolean isEntityCacheEnabled() {
+		return _layoutRevision.isEntityCacheEnabled();
+	}
+
+	@Override
+	public boolean isFinderCacheEnabled() {
+		return _layoutRevision.isFinderCacheEnabled();
 	}
 
 	@Override

@@ -326,6 +326,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long,
 	 *             QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public List<MBThread> getGroupThreads(
 			long groupId, int status, int start, int end)
@@ -377,6 +378,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long, long,
 	 *             boolean, boolean, QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, boolean subscribed,
@@ -394,6 +396,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long, long,
 	 *             boolean, QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, boolean subscribed,
@@ -410,6 +413,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreads(long, long,
 	 *             QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public List<MBThread> getGroupThreads(
 			long groupId, long userId, int status, int start, int end)
@@ -452,6 +456,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreadsCount(long,
 	 *             QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public int getGroupThreadsCount(long groupId, int status)
 		throws SystemException {
@@ -501,6 +506,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreadsCount(long,
 	 *             long, QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public int getGroupThreadsCount(long groupId, long userId, int status)
 		throws SystemException {
@@ -514,6 +520,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreadsCount(long,
 	 *             long, boolean, QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public int getGroupThreadsCount(
 			long groupId, long userId, int status, boolean subscribed)
@@ -529,6 +536,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #getGroupThreadsCount(long,
 	 *             long, boolean, boolean, QueryDefinition)}
 	 */
+	@Deprecated
 	@Override
 	public int getGroupThreadsCount(
 			long groupId, long userId, int status, boolean subscribed,
@@ -654,20 +662,18 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	@BufferedIncrement(
 		configuration = "MBThread", incrementClass = NumberIncrement.class)
 	@Override
-	public MBThread incrementViewCounter(long threadId, int increment)
+	public void incrementViewCounter(long threadId, int increment)
 		throws PortalException, SystemException {
 
-		MBThread thread = mbThreadPersistence.findByPrimaryKey(threadId);
-
 		if (ExportImportThreadLocal.isImportInProcess()) {
-			return thread;
+			return;
 		}
+
+		MBThread thread = mbThreadPersistence.findByPrimaryKey(threadId);
 
 		thread.setViewCount(thread.getViewCount() + increment);
 
 		mbThreadPersistence.update(thread);
-
-		return thread;
 	}
 
 	@Override
@@ -1273,6 +1279,7 @@ public class MBThreadLocalServiceImpl extends MBThreadLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #incrementViewCounter(long,
 	 *             int)}
 	 */
+	@Deprecated
 	@Override
 	public MBThread updateThread(long threadId, int viewCount)
 		throws PortalException, SystemException {

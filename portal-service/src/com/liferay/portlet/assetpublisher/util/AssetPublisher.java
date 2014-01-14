@@ -14,6 +14,8 @@
 
 package com.liferay.portlet.assetpublisher.util;
 
+import aQute.bnd.annotation.ProviderType;
+
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.Group;
@@ -35,6 +37,7 @@ import javax.portlet.PortletRequest;
 /**
  * @author Eudaldo Alonso
  */
+@ProviderType
 public interface AssetPublisher {
 
 	public static final String SCOPE_ID_CHILD_GROUP_PREFIX = "ChildGroup_";
@@ -102,6 +105,7 @@ public interface AssetPublisher {
 	 *             PortletPreferences, PermissionChecker, long[], long[],
 	 *             String[], boolean , boolean)}
 	 */
+	@Deprecated
 	public List<AssetEntry> getAssetEntries(
 			PortletRequest portletRequest,
 			PortletPreferences portletPreferences,
@@ -117,6 +121,7 @@ public interface AssetPublisher {
 	 *             PortletPreferences, PermissionChecker, long[], boolean,
 	 *             boolean)}
 	 */
+	@Deprecated
 	public List<AssetEntry> getAssetEntries(
 			PortletRequest portletRequest,
 			PortletPreferences portletPreferences,

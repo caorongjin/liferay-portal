@@ -54,6 +54,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	 * @deprecated As of 6.1.0 {@link #addVocabulary(String, Map, Map, String,
 	 *             ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public AssetVocabulary addVocabulary(
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
@@ -98,6 +99,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	 * @deprecated As of 6.2.0, Replaced by {@link #deleteVocabularies(long[],
 	 *             ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public void deleteVocabularies(long[] vocabularyIds)
 		throws PortalException, SystemException {
@@ -248,7 +250,9 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			total = getGroupVocabulariesCount(groupId);
 		}
 
-		if (addDefaultVocabulary && (total == 0)) {
+		if (addDefaultVocabulary && (total == 0) &&
+			(assetVocabularyPersistence.countByGroupId(groupId) == 0)) {
+
 			vocabularies = new ArrayList<AssetVocabulary>();
 
 			vocabularies.add(
@@ -273,6 +277,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	/**
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	public JSONObject getJSONGroupVocabularies(
 			long groupId, String name, int start, int end,
@@ -333,6 +338,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 	 * @deprecated As of 6.1.0, {@link #updateVocabulary(long, String, Map, Map,
 	 *             String, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, Map<Locale, String> titleMap,

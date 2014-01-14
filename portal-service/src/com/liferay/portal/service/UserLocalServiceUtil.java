@@ -2226,6 +2226,7 @@ public class UserLocalServiceUtil {
 	* @deprecated As of 6.2.0, replaced by {@link
 	#getUserByUuidAndCompanyId(String, long)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.User getUserByUuid(
 		java.lang.String uuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -2608,6 +2609,32 @@ public class UserLocalServiceUtil {
 		return getService()
 				   .searchCount(companyId, firstName, middleName, lastName,
 			screenName, emailAddress, status, params, andSearch);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String keywords, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchUsers(companyId, keywords, status, params, start,
+			end, sort);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.User> searchUsers(
+		long companyId, java.lang.String firstName,
+		java.lang.String middleName, java.lang.String lastName,
+		java.lang.String screenName, java.lang.String emailAddress, int status,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchUsers(companyId, firstName, middleName, lastName,
+			screenName, emailAddress, status, params, andSearch, start, end,
+			sort);
 	}
 
 	/**
@@ -3454,6 +3481,7 @@ public class UserLocalServiceUtil {
 	String, String, long[], long[], long[], java.util.List,
 	long[], boolean, byte[], ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.User updateUser(long userId,
 		java.lang.String oldPassword, java.lang.String newPassword1,
 		java.lang.String newPassword2, boolean passwordReset,
@@ -3517,6 +3545,7 @@ public class UserLocalServiceUtil {
 	/**
 	 * @deprecated As of 6.2.0
 	 */
+	@Deprecated
 	public void setService(UserLocalService service) {
 	}
 

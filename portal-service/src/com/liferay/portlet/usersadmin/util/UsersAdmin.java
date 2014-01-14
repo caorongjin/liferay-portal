@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.Group;
@@ -111,7 +110,7 @@ public interface UsersAdmin {
 	public OrderByComparator getOrganizationOrderByComparator(
 		String orderByCol, String orderByType);
 
-	public Tuple getOrganizations(Hits hits)
+	public List<Organization> getOrganizations(Hits hits)
 		throws PortalException, SystemException;
 
 	public List<OrgLabor> getOrgLabors(ActionRequest actionRequest);
@@ -130,13 +129,14 @@ public interface UsersAdmin {
 	public List<UserGroupRole> getUserGroupRoles(PortletRequest portletRequest)
 		throws PortalException, SystemException;
 
-	public Tuple getUserGroups(Hits hits)
+	public List<UserGroup> getUserGroups(Hits hits)
 		throws PortalException, SystemException;
 
 	public OrderByComparator getUserOrderByComparator(
 		String orderByCol, String orderByType);
 
-	public Tuple getUsers(Hits hits) throws PortalException, SystemException;
+	public List<User> getUsers(Hits hits)
+		throws PortalException, SystemException;
 
 	public List<Website> getWebsites(ActionRequest actionRequest);
 
@@ -147,6 +147,7 @@ public interface UsersAdmin {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #hasUpdateFieldPermission(User, String)}
 	 */
+	@Deprecated
 	public boolean hasUpdateEmailAddress(
 			PermissionChecker permissionChecker, User user)
 		throws PortalException, SystemException;
@@ -158,6 +159,7 @@ public interface UsersAdmin {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #hasUpdateFieldPermission(User, String)}
 	 */
+	@Deprecated
 	public boolean hasUpdateScreenName(
 			PermissionChecker permissionChecker, User user)
 		throws PortalException, SystemException;

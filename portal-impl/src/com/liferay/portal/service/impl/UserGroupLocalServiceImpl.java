@@ -22,11 +22,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.CharPool;
@@ -46,6 +48,7 @@ import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.UserGroupLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -117,6 +120,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #addUserGroup(long, long,
 	 *             String, String, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public UserGroup addUserGroup(
 			long userId, long companyId, String name, String description)
@@ -244,6 +248,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 6.2.0
 	 */
+	@Deprecated
 	@Override
 	public void copyUserGroupLayouts(long userGroupId, long userId)
 		throws PortalException, SystemException {
@@ -277,6 +282,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 6.1.0
 	 */
+	@Deprecated
 	@Override
 	public void copyUserGroupLayouts(long userGroupId, long[] userIds)
 		throws PortalException, SystemException {
@@ -313,6 +319,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * @throws     SystemException if a system exception occurred
 	 * @deprecated As of 6.1.0
 	 */
+	@Deprecated
 	@Override
 	public void copyUserGroupLayouts(long[] userGroupIds, long userId)
 		throws PortalException, SystemException {
@@ -749,6 +756,57 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 			companyId, name, description, params, andOperator);
 	}
 
+	@Override
+	public BaseModelSearchResult<UserGroup> searchUserGroups(
+			long companyId, String keywords,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+		throws PortalException, SystemException {
+
+		String name = null;
+		String description = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			description = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		return searchUserGroups(
+			companyId, name, description, params, andOperator, start, end,
+			sort);
+	}
+
+	@Override
+	public BaseModelSearchResult<UserGroup> searchUserGroups(
+			long companyId, String name, String description,
+			LinkedHashMap<String, Object> params, boolean andSearch, int start,
+			int end, Sort sort)
+		throws PortalException, SystemException {
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = search(
+				companyId, name, description, params, andSearch, start, end,
+				sort);
+
+			List<UserGroup> userGroups = UsersAdminUtil.getUserGroups(hits);
+
+			if (userGroups != null) {
+				return new BaseModelSearchResult<UserGroup>(
+					userGroups, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
+	}
+
 	/**
 	 * Sets the user groups associated with the user copying the user group
 	 * layouts and removing and adding user group associations for the user as
@@ -829,6 +887,7 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 	 * @deprecated As of 6.2.0, replaced by {@link #updateUserGroup(long, long,
 	 *             String, String, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public UserGroup updateUserGroup(
 			long companyId, long userGroupId, String name, String description)

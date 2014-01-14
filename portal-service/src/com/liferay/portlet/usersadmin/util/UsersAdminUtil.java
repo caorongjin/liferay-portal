@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.Address;
 import com.liferay.portal.model.EmailAddress;
 import com.liferay.portal.model.Group;
@@ -51,6 +50,7 @@ public class UsersAdminUtil {
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link UsersAdmin#CUSTOM_QUESTION}
 	 */
+	@Deprecated
 	public static final String CUSTOM_QUESTION = "write-my-own-question";
 
 	public static void addPortletBreadcrumbEntries(
@@ -177,7 +177,7 @@ public class UsersAdminUtil {
 			orderByCol, orderByType);
 	}
 
-	public static Tuple getOrganizations(Hits hits)
+	public static List<Organization> getOrganizations(Hits hits)
 		throws PortalException, SystemException {
 
 		return getUsersAdmin().getOrganizations(hits);
@@ -218,7 +218,7 @@ public class UsersAdminUtil {
 		return getUsersAdmin().getUserGroupRoles(portletRequest);
 	}
 
-	public static Tuple getUserGroups(Hits hits)
+	public static List<UserGroup> getUserGroups(Hits hits)
 		throws PortalException, SystemException {
 
 		return getUsersAdmin().getUserGroups(hits);
@@ -231,7 +231,7 @@ public class UsersAdminUtil {
 			orderByCol, orderByType);
 	}
 
-	public static Tuple getUsers(Hits hits)
+	public static List<User> getUsers(Hits hits)
 		throws PortalException, SystemException {
 
 		return getUsersAdmin().getUsers(hits);
@@ -257,6 +257,7 @@ public class UsersAdminUtil {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #hasUpdateFieldPermission(User, String)}
 	 */
+	@Deprecated
 	public static boolean hasUpdateEmailAddress(
 			PermissionChecker permissionChecker, User user)
 		throws PortalException, SystemException {
@@ -274,6 +275,7 @@ public class UsersAdminUtil {
 	 * @deprecated As of 6.2.0, replaced by {@link
 	 *             #hasUpdateFieldPermission(User, String)}
 	 */
+	@Deprecated
 	public static boolean hasUpdateScreenName(
 			PermissionChecker permissionChecker, User user)
 		throws PortalException, SystemException {

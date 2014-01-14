@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
+import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
@@ -433,7 +435,9 @@ public class JournalArticleLocalServiceImpl
 
 		// Dynamic data mapping
 
-		if (PortalUtil.getClassNameId(DDMStructure.class) == classNameId) {
+		if (classNameLocalService.getClassNameId(DDMStructure.class) ==
+				classNameId) {
+
 			updateDDMStructureXSD(classPK, content, serviceContext);
 		}
 
@@ -854,7 +858,18 @@ public class JournalArticleLocalServiceImpl
 		String[] assetTagNames = assetTagLocalService.getTagNames(
 			JournalArticle.class.getName(), oldArticle.getResourcePrimKey());
 
-		updateAsset(userId, newArticle, assetCategoryIds, assetTagNames, null);
+		AssetEntry oldAssetEntry = assetEntryLocalService.getEntry(
+			JournalArticle.class.getName(), oldArticle.getResourcePrimKey());
+
+		List<AssetLink> assetLinks = assetLinkLocalService.getDirectLinks(
+			oldAssetEntry.getEntryId());
+
+		long[] assetLinkEntryIds = StringUtil.split(
+			ListUtil.toString(assetLinks, AssetLink.ENTRY_ID2_ACCESSOR), 0L);
+
+		updateAsset(
+			userId, newArticle, assetCategoryIds, assetTagNames,
+			assetLinkEntryIds);
 
 		return newArticle;
 	}
@@ -1510,7 +1525,7 @@ public class JournalArticleLocalServiceImpl
 			long groupId, String className, long classPK)
 		throws PortalException, SystemException {
 
-		long classNameId = PortalUtil.getClassNameId(className);
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		List<JournalArticle> articles = journalArticlePersistence.findByG_C_C(
 			groupId, classNameId, classPK);
@@ -1878,7 +1893,8 @@ public class JournalArticleLocalServiceImpl
 				try {
 					ddmTemplate = ddmTemplatePersistence.findByG_C_T(
 						PortalUtil.getSiteGroupId(article.getGroupId()),
-						PortalUtil.getClassNameId(DDMStructure.class),
+						classNameLocalService.getClassNameId(
+							DDMStructure.class),
 						ddmTemplateKey);
 				}
 				catch (NoSuchTemplateException nste1) {
@@ -1888,7 +1904,8 @@ public class JournalArticleLocalServiceImpl
 
 						ddmTemplate = ddmTemplatePersistence.findByG_C_T(
 							companyGroup.getGroupId(),
-							PortalUtil.getClassNameId(DDMStructure.class),
+							classNameLocalService.getClassNameId(
+								DDMStructure.class),
 							ddmTemplateKey);
 
 						tokens.put(
@@ -1899,7 +1916,8 @@ public class JournalArticleLocalServiceImpl
 						if (!defaultDDMTemplateKey.equals(ddmTemplateKey)) {
 							ddmTemplate = ddmTemplatePersistence.findByG_C_T(
 								PortalUtil.getSiteGroupId(article.getGroupId()),
-								PortalUtil.getClassNameId(DDMStructure.class),
+								classNameLocalService.getClassNameId(
+									DDMStructure.class),
 								defaultDDMTemplateKey);
 						}
 						else {
@@ -2847,7 +2865,7 @@ public class JournalArticleLocalServiceImpl
 			long groupId, String className, long classPK)
 		throws PortalException, SystemException {
 
-		long classNameId = PortalUtil.getClassNameId(className);
+		long classNameId = classNameLocalService.getClassNameId(className);
 
 		List<JournalArticle> articles = journalArticlePersistence.findByG_C_C(
 			groupId, classNameId, classPK, 0, 1,
@@ -4380,6 +4398,92 @@ public class JournalArticleLocalServiceImpl
 			andOperator, new QueryDefinition(status));
 	}
 
+	@Override
+	public BaseModelSearchResult<JournalArticle> searchJournalArticles(
+			long companyId, long groupId, List<Long> folderIds,
+			long classNameId, String ddmStructureKey, String ddmTemplateKey,
+			String keywords, LinkedHashMap<String, Object> params, int start,
+			int end, Sort sort)
+		throws PortalException, SystemException {
+
+		String articleId = null;
+		String title = null;
+		String description = null;
+		String content = null;
+		boolean andOperator = false;
+
+		if (Validator.isNotNull(keywords)) {
+			articleId = keywords;
+			title = keywords;
+			description = keywords;
+			content = keywords;
+		}
+		else {
+			andOperator = true;
+		}
+
+		String status = String.valueOf(WorkflowConstants.STATUS_ANY);
+
+		if (params != null) {
+			params.put("keywords", keywords);
+		}
+
+		return searchJournalArticles(
+			companyId, groupId, folderIds, classNameId, articleId, title,
+			description, content, null, status, ddmStructureKey, ddmTemplateKey,
+			params, andOperator, start, end, sort);
+	}
+
+	@Override
+	public BaseModelSearchResult<JournalArticle> searchJournalArticles(
+			long companyId, long groupId, List<Long> folderIds,
+			long classNameId, String articleId, String title,
+			String description, String content, String type, String status,
+			String ddmStructureKey, String ddmTemplateKey,
+			LinkedHashMap<String, Object> params, boolean andSearch, int start,
+			int end, Sort sort)
+		throws PortalException, SystemException {
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = search(
+				companyId, groupId, folderIds, classNameId, articleId, title,
+				description, content, type, status, ddmStructureKey,
+				ddmTemplateKey, params, andSearch, start, end, sort);
+
+			List<JournalArticle> articles = JournalUtil.getArticles(hits);
+
+			if (articles != null) {
+				return new BaseModelSearchResult<JournalArticle>(
+					articles, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
+	}
+
+	@Override
+	public BaseModelSearchResult<JournalArticle> searchJournalArticles(
+			long groupId, long userId, long creatorUserId, int status,
+			int start, int end)
+		throws PortalException, SystemException {
+
+		for (int i = 0; i < 10; i++) {
+			Hits hits = search(
+				groupId, userId, creatorUserId, status, start, end);
+
+			List<JournalArticle> articles = JournalUtil.getArticles(hits);
+
+			if (articles != null) {
+				return new BaseModelSearchResult<JournalArticle>(
+					articles, hits.getLength());
+			}
+		}
+
+		throw new SearchException(
+			"Unable to fix the search index after 10 attempts");
+	}
+
 	/**
 	 * Subscribes the user to notifications for the web content article matching
 	 * the group, notifying him the instant versions of the article are created,
@@ -4851,7 +4955,7 @@ public class JournalArticleLocalServiceImpl
 
 		// Dynamic data mapping
 
-		if (PortalUtil.getClassNameId(DDMStructure.class) ==
+		if (classNameLocalService.getClassNameId(DDMStructure.class) ==
 				article.getClassNameId()) {
 
 			updateDDMStructureXSD(
@@ -4941,6 +5045,7 @@ public class JournalArticleLocalServiceImpl
 	 *             #updateArticleTranslation(long, String, double, Locale,
 	 *             String, String, String, Map, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public JournalArticle updateArticleTranslation(
 			long groupId, String articleId, double version, Locale locale,
@@ -5665,13 +5770,13 @@ public class JournalArticleLocalServiceImpl
 		try {
 			structure = ddmStructurePersistence.findByG_C_S(
 				PortalUtil.getSiteGroupId(article.getGroupId()),
-				PortalUtil.getClassNameId(JournalArticle.class),
+				classNameLocalService.getClassNameId(JournalArticle.class),
 				article.getStructureId());
 		}
 		catch (NoSuchStructureException nsse) {
 			structure = ddmStructurePersistence.findByG_C_S(
 				companyGroup.getGroupId(),
-				PortalUtil.getClassNameId(JournalArticle.class),
+				classNameLocalService.getClassNameId(JournalArticle.class),
 				article.getStructureId());
 		}
 
@@ -6099,7 +6204,8 @@ public class JournalArticleLocalServiceImpl
 		long classTypeId = 0;
 
 		try {
-			long classNameId = PortalUtil.getClassNameId(JournalArticle.class);
+			long classNameId = classNameLocalService.getClassNameId(
+				JournalArticle.class);
 
 			DDMStructure ddmStructure = ddmStructurePersistence.fetchByG_C_S(
 				article.getGroupId(), classNameId, article.getStructureId());
@@ -6594,7 +6700,7 @@ public class JournalArticleLocalServiceImpl
 		if (Validator.isNotNull(ddmStructureKey)) {
 			DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
 				PortalUtil.getSiteGroupId(groupId),
-				PortalUtil.getClassNameId(JournalArticle.class),
+				classNameLocalService.getClassNameId(JournalArticle.class),
 				ddmStructureKey, true);
 
 			validateDDMStructureFields(
@@ -6603,7 +6709,7 @@ public class JournalArticleLocalServiceImpl
 			if (Validator.isNotNull(ddmTemplateKey)) {
 				DDMTemplate ddmTemplate = ddmTemplateLocalService.getTemplate(
 					PortalUtil.getSiteGroupId(groupId),
-					PortalUtil.getClassNameId(DDMStructure.class),
+					classNameLocalService.getClassNameId(DDMStructure.class),
 					ddmTemplateKey, true);
 
 				if (ddmTemplate.getClassPK() != ddmStructure.getStructureId()) {

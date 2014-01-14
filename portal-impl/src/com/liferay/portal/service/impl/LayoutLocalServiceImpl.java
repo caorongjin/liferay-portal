@@ -192,6 +192,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *             boolean, long, Map, Map, Map, Map, Map, String, String,
 	 *             boolean, Map, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public Layout addLayout(
 			long userId, long groupId, boolean privateLayout,
@@ -329,6 +330,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (!layoutUpdateable) {
 			typeSettingsProperties.put(
 				Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
+		}
+
+		if (privateLayout) {
+			typeSettingsProperties.put(
+				"privateLayout", String.valueOf(privateLayout));
 		}
 
 		validateTypeSettingsProperties(typeSettingsProperties);
@@ -2347,6 +2353,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		typeSettingsProperties.put(
 			Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
 
+		if (privateLayout) {
+			typeSettingsProperties.put(
+				"privateLayout", String.valueOf(privateLayout));
+		}
+
 		layout.setTypeSettingsProperties(typeSettingsProperties);
 
 		String layoutPrototypeUuid = ParamUtil.getString(
@@ -2427,6 +2438,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *             long, long, Map, Map, Map, Map, Map, String, boolean, Map,
 	 *             Boolean, byte[], ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public Layout updateLayout(
 			long groupId, boolean privateLayout, long layoutId,
@@ -2551,6 +2563,20 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setName(name, LocaleUtil.fromLanguageId(languageId));
 
 		layoutPersistence.update(layout);
+
+		Group group = layout.getGroup();
+
+		if (group.isLayoutPrototype()) {
+			LayoutPrototype layoutPrototype =
+				layoutPrototypeLocalService.getLayoutPrototype(
+					group.getClassPK());
+
+			layoutPrototype.setModifiedDate(now);
+			layoutPrototype.setName(
+				name, LocaleUtil.fromLanguageId(languageId));
+
+			layoutPrototypePersistence.update(layoutPrototype);
+		}
 
 		return layout;
 	}
@@ -2902,6 +2928,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	/**
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	@SuppressWarnings("unused")
 	public void updateScopedPortletNames(
@@ -2924,6 +2951,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @see        com.liferay.portlet.portletconfiguration.action.EditScopeAction
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	public void updateScopedPortletNames(
 			long groupId, boolean privateLayout, long layoutId, String name,

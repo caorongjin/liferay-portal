@@ -129,13 +129,14 @@ if (organization != null) {
 			%>
 
 			<portlet:renderURL var="headerBackURL">
-				<portlet:param name="struts_action" value="/organization/view" />
+				<portlet:param name="struts_action" value="/users_admin/view" />
+				<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 				<portlet:param name="organizationId" value="<%= String.valueOf(parentOrganizationId) %>" />
 			</portlet:renderURL>
 
 			<liferay-ui:header
 				backLabel="<%= parentOrganizationName %>"
-				backURL="<%= headerBackURL.toString() %>"
+				backURL="<%= Validator.isNotNull(backURL) ? backURL : headerBackURL.toString() %>"
 				localizeTitle="<%= false %>"
 				title="<%= organization.getName() %>"
 			/>
@@ -239,6 +240,7 @@ if (organization != null) {
 
 					<aui:input disabled="<%= true %>" name="organizationsRedirect" type="hidden" value="<%= portletURL.toString() %>" />
 					<aui:input name="deleteOrganizationIds" type="hidden" />
+					<aui:input name="status" type="hidden" value="<%= status %>" />
 
 					<c:if test="<%= showOrganizations %>">
 						<liferay-util:buffer var="organizationsPanelTitle">
@@ -269,7 +271,11 @@ if (organization != null) {
 							<%
 							SearchContainer searchContainer = new OrganizationSearch(renderRequest, "cur1", currentURLObj);
 
-							searchContainer.setRowChecker(new RowChecker(renderResponse));
+							RowChecker rowChecker = new RowChecker(renderResponse);
+
+							rowChecker.setRowIds("rowIdsOrganizationCheckbox");
+
+							searchContainer.setRowChecker(rowChecker);
 							%>
 
 							<liferay-ui:search-container
@@ -353,6 +359,7 @@ if (organization != null) {
 								>
 									<liferay-portlet:renderURL varImpl="rowURL">
 										<portlet:param name="struts_action" value="/users_admin/view" />
+										<portlet:param name="toolbarItem" value="<%= toolbarItem %>" />
 										<portlet:param name="organizationId" value="<%= String.valueOf(curOrganization.getOrganizationId()) %>" />
 										<portlet:param name="usersListView" value="<%= UserConstants.LIST_VIEW_TREE %>" />
 									</liferay-portlet:renderURL>

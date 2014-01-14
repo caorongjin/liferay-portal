@@ -701,6 +701,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	String, String, long, long, int, String, boolean,
 	ServiceContext)}
 	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization addOrganization(long userId,
 		long parentOrganizationId, java.lang.String name,
@@ -1543,6 +1544,33 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 			countryId, params, andOperator);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.Organization> searchOrganizations(
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.searchOrganizations(companyId,
+			parentOrganizationId, keywords, params, start, end, sort);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.Organization> searchOrganizations(
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.String region,
+		java.lang.String country,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.searchOrganizations(companyId,
+			parentOrganizationId, name, type, street, city, zip, region,
+			country, params, andSearch, start, end, sort);
+	}
+
 	/**
 	* Removes the organizations from the group.
 	*
@@ -1625,6 +1653,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	long, long, String, String, long, long, int, String, boolean,
 	byte[], boolean, ServiceContext)}
 	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
@@ -1707,6 +1736,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	long, long, String, String, long, long, int, String, boolean,
 	boolean, byte[], ServiceContext)}
 	*/
+	@Deprecated
 	@Override
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
@@ -1723,6 +1753,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
+	@Deprecated
 	public OrganizationLocalService getWrappedOrganizationLocalService() {
 		return _organizationLocalService;
 	}
@@ -1730,6 +1761,7 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
+	@Deprecated
 	public void setWrappedOrganizationLocalService(
 		OrganizationLocalService organizationLocalService) {
 		_organizationLocalService = organizationLocalService;

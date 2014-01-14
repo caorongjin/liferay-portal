@@ -752,6 +752,7 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
 	 */
+	@Deprecated
 	public LayoutSet getWrappedLayoutSet() {
 		return _layoutSet;
 	}
@@ -759,6 +760,16 @@ public class LayoutSetWrapper implements LayoutSet, ModelWrapper<LayoutSet> {
 	@Override
 	public LayoutSet getWrappedModel() {
 		return _layoutSet;
+	}
+
+	@Override
+	public boolean isEntityCacheEnabled() {
+		return _layoutSet.isEntityCacheEnabled();
+	}
+
+	@Override
+	public boolean isFinderCacheEnabled() {
+		return _layoutSet.isFinderCacheEnabled();
 	}
 
 	@Override

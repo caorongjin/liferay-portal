@@ -653,6 +653,7 @@ public class OrganizationLocalServiceUtil {
 	String, String, long, long, int, String, boolean,
 	ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.Organization addOrganization(
 		long userId, long parentOrganizationId, java.lang.String name,
 		java.lang.String type, boolean recursable, long regionId,
@@ -1466,6 +1467,33 @@ public class OrganizationLocalServiceUtil {
 			street, city, zip, regionId, countryId, params, andOperator);
 	}
 
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.Organization> searchOrganizations(
+		long companyId, long parentOrganizationId, java.lang.String keywords,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchOrganizations(companyId, parentOrganizationId,
+			keywords, params, start, end, sort);
+	}
+
+	public static com.liferay.portal.kernel.search.BaseModelSearchResult<com.liferay.portal.model.Organization> searchOrganizations(
+		long companyId, long parentOrganizationId, java.lang.String name,
+		java.lang.String type, java.lang.String street, java.lang.String city,
+		java.lang.String zip, java.lang.String region,
+		java.lang.String country,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .searchOrganizations(companyId, parentOrganizationId, name,
+			type, street, city, zip, region, country, params, andSearch, start,
+			end, sort);
+	}
+
 	/**
 	* Removes the organizations from the group.
 	*
@@ -1545,6 +1573,7 @@ public class OrganizationLocalServiceUtil {
 	long, long, String, String, long, long, int, String, boolean,
 	byte[], boolean, ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, boolean recursable,
@@ -1627,6 +1656,7 @@ public class OrganizationLocalServiceUtil {
 	long, long, String, String, long, long, int, String, boolean,
 	boolean, byte[], ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
 		java.lang.String name, java.lang.String type, long regionId,
@@ -1654,6 +1684,7 @@ public class OrganizationLocalServiceUtil {
 	/**
 	 * @deprecated As of 6.2.0
 	 */
+	@Deprecated
 	public void setService(OrganizationLocalService service) {
 	}
 
