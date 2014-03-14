@@ -48,7 +48,7 @@ public class LiferayFileUpload extends ServletFileUpload {
 	}
 
 	@Override
-	public List<LiferayFileItem> parseRequest(HttpServletRequest request)
+	public List<FileItem> parseRequest(HttpServletRequest request)
 		throws FileUploadException {
 
 		_session.removeAttribute(LiferayFileUpload.FILE_NAME);
@@ -60,6 +60,7 @@ public class LiferayFileUpload extends ServletFileUpload {
 	/**
 	 * @deprecated As of 6.1.0
 	 */
+	@Deprecated
 	@Override
 	@SuppressWarnings("rawtypes")
 	protected FileItem createItem(Map headers, boolean formField)

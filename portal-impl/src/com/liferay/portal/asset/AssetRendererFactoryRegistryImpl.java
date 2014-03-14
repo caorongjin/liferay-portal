@@ -32,9 +32,10 @@ public class AssetRendererFactoryRegistryImpl
 	implements AssetRendererFactoryRegistry {
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getAssetRendererFactories(
-	 *             long)}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #getAssetRendererFactories(long)}
 	 */
+	@Deprecated
 	@Override
 	public List<AssetRendererFactory> getAssetRendererFactories() {
 		return ListUtil.fromMapValues(_assetRenderFactoriesMapByClassName);
@@ -62,8 +63,9 @@ public class AssetRendererFactoryRegistryImpl
 	}
 
 	/**
-	 * @deprecated As of 6.2.0, replaced by {@link #getClassNameIds( long)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getClassNameIds(long)}
 	 */
+	@Deprecated
 	@Override
 	public long[] getClassNameIds() {
 		return getClassNameIds(0);

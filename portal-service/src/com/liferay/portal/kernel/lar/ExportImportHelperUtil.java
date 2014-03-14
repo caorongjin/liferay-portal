@@ -43,6 +43,12 @@ import javax.portlet.PortletRequest;
 @ProviderType
 public class ExportImportHelperUtil {
 
+	/**
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             ExportImportDateUtil#getCalendar(PortletRequest, String,
+	 *             boolean)}
+	 */
+	@Deprecated
 	public static Calendar getCalendar(
 		PortletRequest portletRequest, String paramPrefix,
 		boolean timeZoneSensitive) {
@@ -51,6 +57,12 @@ public class ExportImportHelperUtil {
 			portletRequest, paramPrefix, timeZoneSensitive);
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             ExportImportDateUtil#getDateRange(PortletRequest, long,
+	 *             boolean, long, String, String)}
+	 */
+	@Deprecated
 	public static DateRange getDateRange(
 			PortletRequest portletRequest, long groupId, boolean privateLayout,
 			long plid, String portletId, String defaultRange)
@@ -131,6 +143,19 @@ public class ExportImportHelperUtil {
 		return getExportImportHelper().getLayoutIds(layouts);
 	}
 
+	public static long[] getLayoutIds(Map<Long, Boolean> layoutIdMap)
+		throws PortalException, SystemException {
+
+		return getExportImportHelper().getLayoutIds(layoutIdMap);
+	}
+
+	public static long[] getLayoutIds(
+			Map<Long, Boolean> layoutIdMap, long targetGroupId)
+		throws PortalException, SystemException {
+
+		return getExportImportHelper().getLayoutIds(layoutIdMap, targetGroupId);
+	}
+
 	public static ManifestSummary getManifestSummary(
 			long userId, long groupId, Map<String, String[]> parameterMap,
 			File file)
@@ -147,6 +172,14 @@ public class ExportImportHelperUtil {
 
 		return getExportImportHelper().getManifestSummary(
 			userId, groupId, parameterMap, fileEntry);
+	}
+
+	public static List<Layout> getMissingParentLayouts(
+			Layout layout, long liveGroupId)
+		throws PortalException, SystemException {
+
+		return getExportImportHelper().getMissingParentLayouts(
+			layout, liveGroupId);
 	}
 
 	public static long getModelDeletionCount(
@@ -213,6 +246,7 @@ public class ExportImportHelperUtil {
 	 *             #replaceImportContentReferences(PortletDataContext,
 	 *             StagedModel, Element, String, boolean)}
 	 */
+	@Deprecated
 	public static String replaceImportContentReferences(
 			PortletDataContext portletDataContext, Element entityElement,
 			String content, boolean importReferencedContent)
@@ -239,6 +273,7 @@ public class ExportImportHelperUtil {
 	 *             #replaceImportDLReferences(PortletDataContext, StagedModel,
 	 *             String, boolean)}
 	 */
+	@Deprecated
 	public static String replaceImportDLReferences(
 			PortletDataContext portletDataContext, Element entityElement,
 			String content, boolean importReferencedContent)

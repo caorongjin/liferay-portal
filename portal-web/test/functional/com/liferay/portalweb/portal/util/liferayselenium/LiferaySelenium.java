@@ -16,14 +16,16 @@ package com.liferay.portalweb.portal.util.liferayselenium;
 
 import com.thoughtworks.selenium.Selenium;
 
-import java.util.Map;
-
 /**
  * @author Brian Wing Shun Chan
  */
 public interface LiferaySelenium extends Selenium {
 
+	public void antCommand(String fileName, String target) throws Exception;
+
 	public void assertAlert(String pattern) throws Exception;
+
+	public void assertAlertNotPresent() throws Exception;
 
 	public void assertChecked(String pattern) throws Exception;
 
@@ -40,6 +42,8 @@ public interface LiferaySelenium extends Selenium {
 		throws Exception;
 
 	public void assertJavaScriptErrors() throws Exception;
+
+	public void assertLiferayErrors() throws Exception;
 
 	public void assertLocation(String pattern);
 
@@ -100,6 +104,8 @@ public interface LiferaySelenium extends Selenium {
 
 	public String getCurrentYear();
 
+	public String getDependenciesDir();
+
 	public String getEmailBody(String index) throws Exception;
 
 	public String getEmailSubject(String index) throws Exception;
@@ -112,15 +118,21 @@ public interface LiferaySelenium extends Selenium {
 
 	public String getNumberIncrement(String value);
 
+	public String getOutputDir();
+
 	public String getPrimaryTestSuiteName();
 
 	public String getProjectDir();
+
+	public String getSikuliImagesDir();
 
 	public void goBackAndWait();
 
 	public boolean isConfirmation(String pattern);
 
 	public boolean isElementNotPresent(String locator);
+
+	public boolean isElementPresentAfterWait(String locator) throws Exception;
 
 	public boolean isNotChecked(String locator);
 
@@ -162,11 +174,13 @@ public interface LiferaySelenium extends Selenium {
 
 	public void replyToEmail(String to, String body) throws Exception;
 
-	public void saveScreenshot(String fileName) throws Exception;
+	public void saveScreenshot() throws Exception;
 
 	public void saveScreenshotAndSource() throws Exception;
 
 	public void selectAndWait(String selectLocator, String optionLocator);
+
+	public void sendActionDescriptionLogger(String description);
 
 	public boolean sendActionLogger(String command, String[] params);
 
@@ -177,8 +191,11 @@ public interface LiferaySelenium extends Selenium {
 
 	public void sendLogger(String id, String status);
 
-	public void sendLogger(
-		String id, String status, Map<String, String> context);
+	public void sendMacroDescriptionLogger(String description);
+
+	public void sendTestCaseCommandLogger(String command);
+
+	public void sendTestCaseHeaderLogger(String command);
 
 	public void setDefaultTimeout();
 
@@ -187,6 +204,16 @@ public interface LiferaySelenium extends Selenium {
 	public void setPrimaryTestSuiteName(String primaryTestSuiteName);
 
 	public void setTimeoutImplicit(String timeout);
+
+	public void sikuliClick(String image) throws Exception;
+
+	public void sikuliType(String image, String value) throws Exception;
+
+	public void sikuliUploadCommonFile(String image, String value)
+		throws Exception;
+
+	public void sikuliUploadTempFile(String image, String value)
+		throws Exception;
 
 	public void startLogger();
 

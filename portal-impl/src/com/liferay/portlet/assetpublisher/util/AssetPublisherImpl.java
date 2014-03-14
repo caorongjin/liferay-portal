@@ -266,8 +266,14 @@ public class AssetPublisherImpl implements AssetPublisher {
 		for (String customUserAttributeName : customUserAttributeNames) {
 			ExpandoBridge userCustomAttributes = user.getExpandoBridge();
 
-			Serializable userCustomFieldValue =
-				userCustomAttributes.getAttribute(customUserAttributeName);
+			Serializable userCustomFieldValue = null;
+
+			try {
+				userCustomFieldValue = userCustomAttributes.getAttribute(
+					customUserAttributeName);
+			}
+			catch (Exception e) {
+			}
 
 			if (userCustomFieldValue == null) {
 				continue;
@@ -554,10 +560,11 @@ public class AssetPublisherImpl implements AssetPublisher {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             AssetPublisherImpl#getAssetEntries( PortletRequest,
+	 *             AssetPublisherImpl#getAssetEntries(PortletRequest,
 	 *             PortletPreferences, PermissionChecker, long[], long[],
 	 *             String[], boolean , boolean)}
 	 */
+	@Deprecated
 	@Override
 	public List<AssetEntry> getAssetEntries(
 			PortletRequest portletRequest,
@@ -576,10 +583,11 @@ public class AssetPublisherImpl implements AssetPublisher {
 
 	/**
 	 * @deprecated As of 7.0.0, replaced by {@link
-	 *             AssetPublisherImpl#getAssetEntries( PortletRequest,
+	 *             AssetPublisherImpl#getAssetEntries(PortletRequest,
 	 *             PortletPreferences, PermissionChecker, long[], boolean,
 	 *             boolean)}
 	 */
+	@Deprecated
 	@Override
 	public List<AssetEntry> getAssetEntries(
 			PortletRequest portletRequest,
@@ -916,7 +924,15 @@ public class AssetPublisherImpl implements AssetPublisher {
 				return siteGroupId;
 			}
 
-			return GetterUtil.getLong(scopeIdSuffix);
+			long scopeGroupId = GetterUtil.getLong(scopeIdSuffix);
+
+			Group scopeGroup = GroupLocalServiceUtil.fetchGroup(scopeGroupId);
+
+			if (scopeGroup == null) {
+				throw new PrincipalException();
+			}
+
+			return scopeGroupId;
 		}
 		else if (scopeId.startsWith(SCOPE_ID_LAYOUT_UUID_PREFIX)) {
 			String layoutUuid = scopeId.substring(

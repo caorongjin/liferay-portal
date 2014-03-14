@@ -1,4 +1,4 @@
-<definition>
+<definition component-name="portal-user-interface">
 	<var name="pageName" value="CKEditor Page" />
 
 	<set-up>
@@ -10,8 +10,8 @@
 	</tear-down>
 
 	<command name="ViewCKEditorsInheritanceNo" priority="5">
-		<var name="ckEditorFormatOptionsValid" value="Normal,Formatted" />
 		<var name="ckEditorFormatOptionsInvalid" value="Heading,Heading 2,Heading 3,Heading 4,Heading 5,Heading 6" />
+		<var name="ckEditorFormatOptionsValid" value="Normal,Formatted" />
 		<var name="invalidSubstring" value="Heading" />
 		<var name="portlet1Name" value="Message Boards" />
 		<var name="portlet2Name" value="Wiki" />
@@ -65,7 +65,7 @@
 
 		<execute action="CKEditor#selectFrame" value1="relative=top" />
 
-		<execute action="PGWiki#assertClick" locator-key1="ADD_FRONTPAGE" value1="This page is empty. Edit it to add some text."/>
+		<execute action="PGWiki#assertClick" locator-key1="ADD_FRONTPAGE" value1="This page is empty. Edit it to add some text." />
 
 		<execute action="CKEditor#assertTextEquals" locator-key1="CKEDITOR_TOOLBAR_FONT_BUTTON_PORTLET" value1="Font" />
 		<execute action="CKEditor#assertTextEquals" locator-key1="CKEDITOR_TOOLBAR_SIZE_BUTTON_PORTLET" value1="Size" />

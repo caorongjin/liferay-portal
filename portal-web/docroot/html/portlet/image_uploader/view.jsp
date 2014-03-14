@@ -37,7 +37,9 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 		%>
 
 		<aui:script>
-			Liferay.Util.getOpener().<%= HtmlUtil.escapeJS(randomNamespace) %>changeLogo('<%= previewURL %>', '<%= fileEntry.getFileEntryId() %>');
+			<c:if test="<%= fileEntry != null %>">
+				Liferay.Util.getOpener().<%= HtmlUtil.escapeJS(randomNamespace) %>changeLogo('<%= previewURL %>', '<%= fileEntry.getFileEntryId() %>');
+			</c:if>
 
 			Liferay.Util.getWindow().hide();
 		</aui:script>
@@ -54,16 +56,17 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 			<aui:input name="previewURL" type="hidden" value="<%= previewURL %>" />
 			<aui:input name="randomNamespace" type="hidden" value="<%= randomNamespace %>" />
 			<aui:input name="tempImageFileName" type="hidden" value="<%= tempImageFileName %>" />
+			<aui:input name="imageUploaded" type="hidden" value='<%= SessionMessages.contains(renderRequest, "imageUploaded") %>' />
 
 			<liferay-ui:error exception="<%= NoSuchFileException.class %>" message="an-unexpected-error-occurred-while-uploading-your-file" />
 			<liferay-ui:error exception="<%= UploadException.class %>" message="an-unexpected-error-occurred-while-uploading-your-file" />
 
 			<liferay-ui:error exception="<%= FileSizeException.class %>">
-				<liferay-ui:message arguments="<%= maxFileSize %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" />
+				<liferay-ui:message arguments="<%= TextFormatter.formatStorageSize(maxFileSize, locale) %>" key="please-enter-a-file-with-a-valid-file-size-no-larger-than-x" translateArguments="<%= false %>" />
 			</liferay-ui:error>
 
 			<aui:fieldset cssClass="lfr-portrait-editor">
-				<aui:input autoFocus="<= windowState.equals(WindowState.MAXIMIZED) %>" label='<%= LanguageUtil.format(pageContext, "upload-images-no-larger-than-x-k", maxFileSize, false) %>' name="fileName" size="50" type="file" />
+				<aui:input autoFocus="<= windowState.equals(WindowState.MAXIMIZED) %>" label='<%= LanguageUtil.format(pageContext, "upload-images-no-larger-than-x", TextFormatter.formatStorageSize(maxFileSize, locale), false) %>' name="fileName" size="50" type="file" />
 
 				<div class="lfr-change-logo lfr-portrait-preview" id="<portlet:namespace />portraitPreview">
 					<img alt="image-preview" class="lfr-portrait-preview-img" id="<portlet:namespace />portraitPreviewImg" src="<%= HtmlUtil.escape(currentImageURL) %>" />
@@ -81,13 +84,24 @@ String randomNamespace = ParamUtil.getString(request, "randomNamespace");
 			<portlet:actionURL var="addTempImageURL">
 				<portlet:param name="struts_action" value="/image_uploader/view" />
 				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_TEMP %>" />
-				<portlet:param name="tempImageFileName" value="<%= tempImageFileName %>" />
 			</portlet:actionURL>
+
+			var imageUploadedInput = A.one('#<portlet:namespace />imageUploaded');
 
 			var logoEditor = new Liferay.LogoEditor(
 				{
-					maxFileSize: '<%= maxFileSize %>',
+
+					<%
+					DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance(locale);
+					%>
+
+					decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
+
+					maxFileSize: <%= maxFileSize %>,
 					namespace: '<portlet:namespace />',
+					on: {
+						uploadComplete: A.bind('val', imageUploadedInput, true)
+					},
 					previewURL: '<%= previewURL %>',
 					uploadURL: '<%= addTempImageURL %>'
 				}

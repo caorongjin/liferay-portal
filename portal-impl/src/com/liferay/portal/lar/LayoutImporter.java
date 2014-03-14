@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -194,8 +193,6 @@ public class LayoutImporter {
 			Boolean.TRUE.booleanValue());
 		boolean deletePortletData = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.DELETE_PORTLET_DATA);
-		boolean importCategories = MapUtil.getBoolean(
-			parameterMap, PortletDataHandlerKeys.CATEGORIES);
 		boolean importPermissions = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.PERMISSIONS);
 		boolean importLogo = MapUtil.getBoolean(
@@ -221,7 +218,6 @@ public class LayoutImporter {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Delete portlet data " + deletePortletData);
-			_log.debug("Import categories " + importCategories);
 			_log.debug("Import permissions " + importPermissions);
 		}
 
@@ -383,10 +379,22 @@ public class LayoutImporter {
 			}
 
 			if (existingLayoutSetPrototype == null) {
+				List<LayoutSet> layoutSets =
+					LayoutSetLocalServiceUtil.
+						getLayoutSetsByLayoutSetPrototypeUuid(
+							layoutSetPrototype.getUuid());
+
 				layoutSetPrototype.setUuid(importedLayoutSetPrototypeUuid);
 
 				LayoutSetPrototypeLocalServiceUtil.updateLayoutSetPrototype(
 					layoutSetPrototype);
+
+				for (LayoutSet curLayoutSet : layoutSets) {
+					curLayoutSet.setLayoutSetPrototypeUuid(
+						importedLayoutSetPrototypeUuid);
+
+					LayoutSetLocalServiceUtil.updateLayoutSet(curLayoutSet);
+				}
 			}
 		}
 		else if (larType.equals("layout-set-prototype")) {
@@ -411,17 +419,8 @@ public class LayoutImporter {
 				logoPath);
 
 			if (ArrayUtil.isNotEmpty(iconBytes)) {
-				File logo = null;
-
-				try {
-					logo = FileUtil.createTempFile(iconBytes);
-
-					LayoutSetLocalServiceUtil.updateLogo(
-						groupId, privateLayout, true, logo);
-				}
-				finally {
-					FileUtil.delete(logo);
-				}
+				LayoutSetLocalServiceUtil.updateLogo(
+					groupId, privateLayout, true, iconBytes);
 			}
 			else {
 				LayoutSetLocalServiceUtil.updateLogo(
@@ -439,9 +438,8 @@ public class LayoutImporter {
 				groupId, privateLayout, settings);
 		}
 
-		// Read asset categories, asset tags, comments, locks, permissions, and
-		// ratings entries to make them available to the data handlers through
-		// the context
+		// Read asset tags, expando tables, locks, and permissions to make them
+		// available to the data handlers through the context
 
 		Element portletsElement = _rootElement.element("portlets");
 
@@ -462,12 +460,9 @@ public class LayoutImporter {
 			_permissionImporter.readPortletDataPermissions(portletDataContext);
 		}
 
-		_portletImporter.readAssetCategories(portletDataContext);
 		_portletImporter.readAssetTags(portletDataContext);
-		_portletImporter.readComments(portletDataContext);
 		_portletImporter.readExpandoTables(portletDataContext);
 		_portletImporter.readLocks(portletDataContext);
-		_portletImporter.readRatingsEntries(portletDataContext);
 
 		// Layouts
 
@@ -680,6 +675,8 @@ public class LayoutImporter {
 		long lastMergeTime = System.currentTimeMillis();
 
 		for (Layout layout : newLayouts) {
+			layout = LayoutLocalServiceUtil.getLayout(layout.getPlid());
+
 			boolean modifiedTypeSettingsProperties = false;
 
 			UnicodeProperties typeSettingsProperties =
@@ -724,6 +721,13 @@ public class LayoutImporter {
 		if (layoutsImportMode.equals(
 				PortletDataHandlerKeys.
 					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
+
+			// The layout set may be stale because LayoutUtil#update(layout)
+			// triggers LayoutSetPrototypeLayoutListener and that may have
+			// updated this layout set
+
+			layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+				layoutSet.getLayoutSetId());
 
 			UnicodeProperties settingsProperties =
 				layoutSet.getSettingsProperties();

@@ -78,10 +78,22 @@ public interface ExportImportHelper {
 	public static final String TEMP_FOLDER_NAME =
 		ExportImportHelper.class.getName();
 
+	/**
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             ExportImportDateUtil#getCalendar(PortletRequest, String,
+	 *             boolean)}
+	 */
+	@Deprecated
 	public Calendar getCalendar(
 		PortletRequest portletRequest, String paramPrefix,
 		boolean timeZoneSensitive);
 
+	/**
+	 * @deprecated As of 7.0.0, moved to {@link
+	 *             ExportImportDateUtil#getDateRange(PortletRequest, long,
+	 *             boolean, long, String, String)}
+	 */
+	@Deprecated
 	public DateRange getDateRange(
 			PortletRequest portletRequest, long groupId, boolean privateLayout,
 			long plid, String portletId, String defaultRange)
@@ -119,6 +131,13 @@ public interface ExportImportHelper {
 
 	public long[] getLayoutIds(List<Layout> layouts);
 
+	public long[] getLayoutIds(Map<Long, Boolean> layoutIdMap)
+		throws PortalException, SystemException;
+
+	public long[] getLayoutIds(
+			Map<Long, Boolean> layoutIdMap, long targetGroupId)
+		throws PortalException, SystemException;
+
 	public ManifestSummary getManifestSummary(
 			long userId, long groupId, Map<String, String[]> parameterMap,
 			File file)
@@ -128,6 +147,9 @@ public interface ExportImportHelper {
 			long userId, long groupId, Map<String, String[]> parameterMap,
 			FileEntry fileEntry)
 		throws Exception;
+
+	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
+		throws PortalException, SystemException;
 
 	public long getModelDeletionCount(
 			final PortletDataContext portletDataContext,
@@ -166,6 +188,7 @@ public interface ExportImportHelper {
 	 *             #replaceImportContentReferences(PortletDataContext,
 	 *             StagedModel, Element, String, boolean)}
 	 */
+	@Deprecated
 	public String replaceImportContentReferences(
 			PortletDataContext portletDataContext, Element entityElement,
 			String content, boolean importReferencedContent)
@@ -182,6 +205,7 @@ public interface ExportImportHelper {
 	 *             #replaceImportDLReferences(PortletDataContext, StagedModel,
 	 *             String, boolean)}
 	 */
+	@Deprecated
 	public String replaceImportDLReferences(
 			PortletDataContext portletDataContext, Element entityElement,
 			String content, boolean importReferencedContent)

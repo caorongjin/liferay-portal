@@ -1148,12 +1148,39 @@ public class UserServiceUtil {
 	or if the current user did not have permission to update the
 	user's workflow status.
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 7.0.0, replaced by {@link #updateStatus(long, int,
+	ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.User updateStatus(long userId,
 		int status)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().updateStatus(userId, status);
+	}
+
+	/**
+	* Updates the user's workflow status.
+	*
+	* @param userId the primary key of the user
+	* @param status the user's new workflow status
+	* @param serviceContext the service context to be applied. You can specify
+	an unencrypted custom password (used by an LDAP listener) for the
+	user via attribute <code>passwordUnencrypted</code>.
+	* @return the user
+	* @throws PortalException if a user with the primary key could not be
+	found, if the current user was updating her own status to
+	anything but {@link
+	com.liferay.portal.kernel.workflow.WorkflowConstants#STATUS_APPROVED},
+	or if the current user did not have permission to update the
+	user's workflow status.
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.liferay.portal.model.User updateStatus(long userId,
+		int status, com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateStatus(userId, status, serviceContext);
 	}
 
 	/**
@@ -1335,6 +1362,7 @@ public class UserServiceUtil {
 	java.util.List, java.util.List, boolean, byte[],
 	com.liferay.portal.service.ServiceContext)}
 	*/
+	@Deprecated
 	public static com.liferay.portal.model.User updateUser(long userId,
 		java.lang.String oldPassword, java.lang.String newPassword1,
 		java.lang.String newPassword2, boolean passwordReset,
@@ -1481,6 +1509,7 @@ public class UserServiceUtil {
 	/**
 	 * @deprecated As of 6.2.0
 	 */
+	@Deprecated
 	public void setService(UserService service) {
 	}
 

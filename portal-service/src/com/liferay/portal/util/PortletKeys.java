@@ -35,6 +35,8 @@ public class PortletKeys {
 
 	public static final String ASSET_BROWSER = "172";
 
+	public static final String ASSET_CATEGORIES_ADMIN = "147";
+
 	public static final String ASSET_CATEGORIES_NAVIGATION = "122";
 
 	public static final String ASSET_PUBLISHER = "101";
@@ -56,6 +58,8 @@ public class PortletKeys {
 	public static final String CALENDAR = "8";
 
 	public static final String CHAT = "1_WAR_chatportlet";
+
+	public static final String COMMENTS = "196";
 
 	public static final String CONTROL_PANEL_HOME = "190";
 
@@ -186,7 +190,13 @@ public class PortletKeys {
 
 	public static final int PREFS_OWNER_TYPE_GROUP = 2;
 
+	public static final int PREFS_OWNER_TYPE_GROUP_DEFAULTS_COMPANY = 9;
+
 	public static final int PREFS_OWNER_TYPE_LAYOUT = 3;
+
+	public static final int PREFS_OWNER_TYPE_LAYOUT_DEFAULTS_COMPANY = 8;
+
+	public static final int PREFS_OWNER_TYPE_LAYOUT_DEFAULTS_GROUP = 7;
 
 	public static final int PREFS_OWNER_TYPE_ORGANIZATION = 6;
 
@@ -245,6 +255,7 @@ public class PortletKeys {
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #ASSET_CATEGORIES_NAVIGATION}
 	 */
+	@Deprecated
 	public static final String TAGS_CATEGORIES_NAVIGATION =
 		ASSET_CATEGORIES_NAVIGATION;
 
@@ -255,6 +266,7 @@ public class PortletKeys {
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link #ASSET_TAGS_NAVIGATION}
 	 */
+	@Deprecated
 	public static final String TAGS_ENTRIES_NAVIGATION = ASSET_TAGS_NAVIGATION;
 
 	public static final String TRANSLATOR = "26";

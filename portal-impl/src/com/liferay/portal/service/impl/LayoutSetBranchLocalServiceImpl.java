@@ -368,6 +368,7 @@ public class LayoutSetBranchLocalServiceImpl
 	 * @deprecated As of 6.2.0, replaced by {@link #getUserLayoutSetBranch(long,
 	 *             long, boolean, long, long)}
 	 */
+	@Deprecated
 	@Override
 	public LayoutSetBranch getUserLayoutSetBranch(
 			long userId, long groupId, boolean privateLayout,
@@ -447,7 +448,8 @@ public class LayoutSetBranchLocalServiceImpl
 			sb.append(
 				LanguageUtil.format(
 					locale, "merged-from-x-x",
-					new String[] {mergeLayoutSetBranch.getName(), nowString}));
+					new String[] {mergeLayoutSetBranch.getName(), nowString},
+					false));
 
 			LayoutBranch layoutBranch =
 				layoutBranchLocalService.addLayoutBranch(

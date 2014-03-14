@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.portal.LARFileNameException;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.RequiredLayoutException;
@@ -31,6 +32,7 @@ import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -75,6 +77,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.LayoutComparator;
 import com.liferay.portal.util.comparator.LayoutPriorityComparator;
+import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 import com.liferay.portlet.dynamicdatalists.RecordSetDuplicateRecordSetKeyException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
@@ -192,6 +195,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *             boolean, long, Map, Map, Map, Map, Map, String, String,
 	 *             boolean, Map, ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public Layout addLayout(
 			long userId, long groupId, boolean privateLayout,
@@ -331,6 +335,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
 		}
 
+		if (privateLayout) {
+			typeSettingsProperties.put(
+				"privateLayout", String.valueOf(privateLayout));
+		}
+
 		validateTypeSettingsProperties(typeSettingsProperties);
 
 		layout.setTypeSettingsProperties(typeSettingsProperties);
@@ -423,6 +432,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			groupId, privateLayout);
 
 		layout.setLayoutSet(layoutSet);
+
+		// Asset
+
+		updateAsset(
+			userId, layout, serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames());
 
 		// Message boards
 
@@ -570,7 +585,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getLayoutId());
 
 		for (Layout childLayout : childLayouts) {
-			deleteLayout(childLayout, updateLayoutSet, serviceContext);
+			layoutLocalService.deleteLayout(
+				childLayout, updateLayoutSet, serviceContext);
 		}
 
 		// Layout friendly URLs
@@ -587,6 +603,20 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		subscriptionLocalService.deleteSubscriptions(
 			layout.getCompanyId(), Layout.class.getName(), layout.getPlid());
+
+		// Asset
+
+		SystemEventHierarchyEntryThreadLocal.pop(
+			Layout.class, layout.getPlid());
+
+		try {
+			assetEntryLocalService.deleteEntry(
+				Layout.class.getName(), layout.getPlid());
+		}
+		finally {
+			SystemEventHierarchyEntryThreadLocal.push(
+				Layout.class, layout.getPlid());
+		}
 
 		// Ratings
 
@@ -705,7 +735,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Layout layout = layoutPersistence.findByG_P_L(
 			groupId, privateLayout, layoutId);
 
-		deleteLayout(layout, true, serviceContext);
+		layoutLocalService.deleteLayout(layout, true, serviceContext);
 	}
 
 	/**
@@ -724,7 +754,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Layout layout = layoutPersistence.findByPrimaryKey(plid);
 
-		deleteLayout(layout, true, serviceContext);
+		layoutLocalService.deleteLayout(layout, true, serviceContext);
 	}
 
 	/**
@@ -756,7 +786,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		for (Layout layout : layouts) {
 			try {
-				deleteLayout(layout, false, serviceContext);
+				layoutLocalService.deleteLayout(layout, false, serviceContext);
 			}
 			catch (NoSuchLayoutException nsle) {
 			}
@@ -887,6 +917,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long[] layoutIds, Map<String, String[]> parameterMap,
 			Date startDate, Date endDate, String fileName)
 		throws PortalException, SystemException {
+
+		if (!DLStoreUtil.isValidName(fileName)) {
+			throw new LARFileNameException(fileName);
+		}
 
 		Map<String, Serializable> taskContextMap =
 			BackgroundTaskContextMapFactory.buildTaskContextMap(
@@ -1197,7 +1231,15 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		if (Validator.isNull(friendlyURL)) {
-			throw new NoSuchLayoutException();
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("{groupId=");
+			sb.append(groupId);
+			sb.append(", privateLayout=");
+			sb.append(privateLayout);
+			sb.append("}");
+
+			throw new NoSuchLayoutException(sb.toString());
 		}
 
 		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(friendlyURL);
@@ -1226,7 +1268,17 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		if (layout == null) {
-			throw new NoSuchLayoutException();
+			StringBundler sb = new StringBundler(7);
+
+			sb.append("{groupId=");
+			sb.append(groupId);
+			sb.append(", privateLayout=");
+			sb.append(privateLayout);
+			sb.append(", friendlyURL=");
+			sb.append(friendlyURL);
+			sb.append("}");
+
+			throw new NoSuchLayoutException(sb.toString());
 		}
 
 		return layout;
@@ -2178,6 +2230,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layoutSetLocalService.updatePageCount(groupId, privateLayout);
 	}
 
+	@Override
+	public void updateAsset(
+			long userId, Layout layout, long[] assetCategoryIds,
+			String[] assetTagNames)
+		throws PortalException, SystemException {
+
+		assetEntryLocalService.updateEntry(
+			userId, layout.getGroupId(), layout.getCreateDate(),
+			layout.getModifiedDate(), Layout.class.getName(), layout.getPlid(),
+			layout.getUuid(), 0, assetCategoryIds, assetTagNames, false, null,
+			null, null, ContentTypes.TEXT_HTML,
+			layout.getName(LocaleUtil.getDefault()), null, null, null, null, 0,
+			0, null, false);
+	}
+
 	/**
 	 * Updates the friendly URL of the layout.
 	 *
@@ -2347,6 +2414,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		typeSettingsProperties.put(
 			Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
 
+		if (privateLayout) {
+			typeSettingsProperties.put(
+				"privateLayout", String.valueOf(privateLayout));
+		}
+
 		layout.setTypeSettingsProperties(typeSettingsProperties);
 
 		String layoutPrototypeUuid = ParamUtil.getString(
@@ -2369,6 +2441,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getUserId(), layout.getCompanyId(), layout.getGroupId(),
 			layout.getPlid(), layout.isPrivateLayout(), friendlyURLMap,
 			serviceContext);
+
+		// Asset
+
+		updateAsset(
+			serviceContext.getUserId(), layout,
+			serviceContext.getAssetCategoryIds(),
+			serviceContext.getAssetTagNames());
 
 		return layout;
 	}
@@ -2427,6 +2506,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *             long, long, Map, Map, Map, Map, Map, String, boolean, Map,
 	 *             Boolean, byte[], ServiceContext)}
 	 */
+	@Deprecated
 	@Override
 	public Layout updateLayout(
 			long groupId, boolean privateLayout, long layoutId,
@@ -2551,6 +2631,20 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setName(name, LocaleUtil.fromLanguageId(languageId));
 
 		layoutPersistence.update(layout);
+
+		Group group = layout.getGroup();
+
+		if (group.isLayoutPrototype()) {
+			LayoutPrototype layoutPrototype =
+				layoutPrototypeLocalService.getLayoutPrototype(
+					group.getClassPK());
+
+			layoutPrototype.setModifiedDate(now);
+			layoutPrototype.setName(
+				name, LocaleUtil.fromLanguageId(languageId));
+
+			layoutPrototypePersistence.update(layoutPrototype);
+		}
 
 		return layout;
 	}
@@ -2902,6 +2996,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	/**
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	@SuppressWarnings("unused")
 	public void updateScopedPortletNames(
@@ -2924,6 +3019,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @see        com.liferay.portlet.portletconfiguration.action.EditScopeAction
 	 * @deprecated As of 6.2.0, with no direct replacement
 	 */
+	@Deprecated
 	@Override
 	public void updateScopedPortletNames(
 			long groupId, boolean privateLayout, long layoutId, String name,

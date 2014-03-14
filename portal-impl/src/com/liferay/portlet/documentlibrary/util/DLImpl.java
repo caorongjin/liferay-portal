@@ -356,12 +356,12 @@ public class DLImpl implements DL {
 		sb.append(StringPool.SPACE);
 
 		for (Folder curFolder : folders) {
-			sb.append(StringPool.RAQUO);
+			sb.append(StringPool.RAQUO_CHAR);
 			sb.append(StringPool.SPACE);
 			sb.append(curFolder.getName());
 		}
 
-		sb.append(StringPool.RAQUO);
+		sb.append(StringPool.RAQUO_CHAR);
 		sb.append(StringPool.SPACE);
 		sb.append(folder.getName());
 
@@ -748,6 +748,7 @@ public class DLImpl implements DL {
 	 * @deprecated As of 6.2.0, replaced by {@link #getPreviewURL(FileEntry,
 	 *             FileVersion, ThemeDisplay, String, boolean, boolean)}
 	 */
+	@Deprecated
 	@Override
 	public String getPreviewURL(
 		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
@@ -786,7 +787,7 @@ public class DLImpl implements DL {
 		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(title)));
 
 		sb.append(StringPool.SLASH);
-		sb.append(fileEntry.getUuid());
+		sb.append(HttpUtil.encodeURL(fileEntry.getUuid()));
 
 		if (appendVersion) {
 			sb.append("?version=");
@@ -1167,13 +1168,13 @@ public class DLImpl implements DL {
 		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			Folder folder = DLAppLocalServiceUtil.getFolder(folderId);
 
+			ancestorFolderIds.add(folderId);
+
 			if (recursive) {
-				ancestorFolderIds = folder.getAncestorFolderIds();
+				ancestorFolderIds.addAll(folder.getAncestorFolderIds());
 
 				ancestorFolderIds.add(groupId);
 			}
-
-			ancestorFolderIds.add(0, folderId);
 		}
 		else {
 			ancestorFolderIds.add(groupId);
